@@ -198,10 +198,10 @@ export const SKILLS = {
             name: '圣光惩戒',
             description: '用神圣之光惩戒邪恶敌人',
             type: 'attack',
-            baseDamage: 120,
+            baseDamage: 150,
             baseEffect: 0,
             magicCost: 12,
-            levelBonus: 8,
+            levelBonus: 10,
             maxLevel: 60
         },
         {
@@ -259,10 +259,10 @@ export const SKILLS = {
             name: '盾击',
             description: '用盾牌猛击敌人',
             type: 'attack',
-            baseDamage: 100,
+            baseDamage: 140,
             baseEffect: 0,
             magicCost: 10,
-            levelBonus: 6,
+            levelBonus: 8,
             maxLevel: 60
         },
         {
@@ -306,11 +306,11 @@ export const SKILLS = {
             name: '破盾',
             description: '攻击敌人并降低其防御力',
             type: 'attack',
-            baseDamage: 80,
+            baseDamage: 120,
             baseEffect: 15,
             effectType: 'defense_down',
             magicCost: 16,
-            levelBonus: 4,
+            levelBonus: 6,
             effectBonus: 1,
             maxLevel: 60
         }

@@ -187,10 +187,14 @@ export function calculateBattleStats(className, level, baseStats) {
     stats.moveSpeed = +(3 + (baseStats.agility / 12) * 0.12).toFixed(2);
 
     if (className === '武僧') {
-        stats.atkSpeed = +(stats.atkSpeed + baseStats.agility * 0.02).toFixed(2);
+        stats.atkSpeed = +(stats.atkSpeed + 0.15).toFixed(2);
     }
 
     stats.critRate = +(baseStats.luck * 0.0035).toFixed(4);
+
+    if (className === '游侠') {
+        stats.critRate = +(stats.critRate * 1.5).toFixed(4);
+    }
 
     if (className === '平民') {
         stats.critRate = +(stats.critRate + baseStats.luck * 0.0025).toFixed(4);

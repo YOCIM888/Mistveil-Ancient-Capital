@@ -19,13 +19,13 @@ export const CLASS_BASE_STATS = {
 };
 
 export const CLASS_COEFFICIENTS = {
-    '狂战': { hpCoefficient: 2.7, attackCoefficient: { stat: 'strength', value: 1.6 }, defenseCoefficient: 1.0 },
-    '游侠': { hpCoefficient: 2.2, attackCoefficient: { stat: 'agility', value: 1.4 }, defenseCoefficient: 0.7 },
-    '牧师': { hpCoefficient: 2.0, attackCoefficient: { stat: 'perception', value: 1.3 }, defenseCoefficient: 0.6 },
-    '法师': { hpCoefficient: 1.7, attackCoefficient: { stat: 'intelligence', value: 1.5 }, defenseCoefficient: 0.5 },
-    '盾骑': { hpCoefficient: 3.1, attackCoefficient: { stat: 'strength', value: 1.0 }, defenseCoefficient: 1.3 },
-    '武僧': { hpCoefficient: 2.4, attackCoefficient: { stat: 'agility', value: 1.4 }, defenseCoefficient: 0.9 },
-    '平民': { hpCoefficient: 2.0, attackCoefficient: { stat: 'average', value: 1.0 }, defenseCoefficient: 0.6 }
+    '狂战': { hpCoefficient: 2.5, attackCoefficient: { stat: 'strength', value: 1.6 }, defenseCoefficient: 0.8 },
+    '游侠': { hpCoefficient: 2.3, attackCoefficient: { stat: 'agility', value: 1.4 }, defenseCoefficient: 0.75 },
+    '牧师': { hpCoefficient: 2.2, attackCoefficient: { stat: 'perception', value: 1.4 }, defenseCoefficient: 0.7 },
+    '法师': { hpCoefficient: 2.0, attackCoefficient: { stat: 'intelligence', value: 1.7 }, defenseCoefficient: 0.6 },
+    '盾骑': { hpCoefficient: 2.8, attackCoefficient: { stat: 'strength', value: 1.2 }, defenseCoefficient: 1.2 },
+    '武僧': { hpCoefficient: 2.2, attackCoefficient: { stat: 'agility', value: 1.4 }, defenseCoefficient: 0.7 },
+    '平民': { hpCoefficient: 2.2, attackCoefficient: { stat: 'luck', value: 1.3 }, defenseCoefficient: 0.7 }
 };
 
 export const WARRIOR_GROWTH = {

@@ -7,10 +7,10 @@ export const TALENTS = {
             description: '每次攻击有概率回复生命值',
             effectType: 'lifesteal',
             baseValue: 3,
-            perLevel: 2,
+            perLevel: 1.5,
             maxLevel: 60,
             getEffect: (level) => {
-                const value = 3 + (level - 1) * 2;
+                const value = 3 + (level - 1) * 1.5;
                 return `攻击时有${value}%概率回复最大生命值的5%`;
             }
         },
@@ -21,10 +21,10 @@ export const TALENTS = {
             description: '生命值越低，攻击力越高',
             effectType: 'hp_bonus',
             baseValue: 2,
-            perLevel: 1.5,
+            perLevel: 1.0,
             maxLevel: 60,
             getEffect: (level) => {
-                const value = 2 + (level - 1) * 1.5;
+                const value = 2 + (level - 1) * 1.0;
                 return `生命值低于50%时，攻击力提升${value}%`;
             }
         },
@@ -35,10 +35,10 @@ export const TALENTS = {
             description: '无视敌人部分防御力',
             effectType: 'armor_pierce',
             baseValue: 5,
-            perLevel: 3,
+            perLevel: 1.5,
             maxLevel: 60,
             getEffect: (level) => {
-                const value = 5 + (level - 1) * 3;
+                const value = 5 + (level - 1) * 1.5;
                 return `攻击时无视敌人${value}%防御力`;
             }
         }
@@ -79,10 +79,10 @@ export const TALENTS = {
             description: '提升攻击速度',
             effectType: 'attack_speed',
             baseValue: 3,
-            perLevel: 1.5,
+            perLevel: 1.0,
             maxLevel: 60,
             getEffect: (level) => {
-                const value = 3 + (level - 1) * 1.5;
+                const value = 3 + (level - 1) * 1.0;
                 return `攻击速度提升${value}%`;
             }
         }
@@ -134,16 +134,16 @@ export const TALENTS = {
     '法师': [
         {
             id: 'mage_mana_efficiency',
-            name: '魔力精通',
-            icon: '💎',
-            description: '提升最大魔力值',
-            effectType: 'max_mana',
-            baseValue: 5,
-            perLevel: 3,
+            name: '元素亲和',
+            icon: '�',
+            description: '提升攻击和防御力',
+            effectType: 'dual_stat',
+            baseValue: 4,
+            perLevel: 2.5,
             maxLevel: 60,
             getEffect: (level) => {
-                const value = 5 + (level - 1) * 3;
-                return `最大魔力值提升${value}点`;
+                const value = 4 + (level - 1) * 2.5;
+                return `攻击和防御各提升${value}点`;
             }
         },
         {
@@ -167,10 +167,10 @@ export const TALENTS = {
             description: '小幅提升全属性',
             effectType: 'all_stats',
             baseValue: 1,
-            perLevel: 0.5,
+            perLevel: 0.8,
             maxLevel: 60,
             getEffect: (level) => {
-                const value = 1 + (level - 1) * 0.5;
+                const value = 1 + (level - 1) * 0.8;
                 return `全属性提升${value}点`;
             }
         }
@@ -285,10 +285,10 @@ export const TALENTS = {
             description: '提升生命值上限',
             effectType: 'max_hp',
             baseValue: 2,
-            perLevel: 1,
+            perLevel: 2,
             maxLevel: 60,
             getEffect: (level) => {
-                const value = 2 + (level - 1) * 1;
+                const value = 2 + (level - 1) * 2;
                 return `最大生命值提升${value}点`;
             }
         },
@@ -299,10 +299,10 @@ export const TALENTS = {
             description: '小幅提升全属性',
             effectType: 'all_stats',
             baseValue: 1,
-            perLevel: 0.5,
+            perLevel: 1.0,
             maxLevel: 60,
             getEffect: (level) => {
-                const value = 1 + (level - 1) * 0.5;
+                const value = 1 + (level - 1) * 1.0;
                 return `全属性提升${value}点`;
             }
         }

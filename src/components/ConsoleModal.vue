@@ -335,6 +335,7 @@ function executeCommand(cmd) {
       inventoryStore.addItem({
         name: '创世契约',
         icon: ITEMS['创世契约']?.icon || '',
+        img: ITEMS['创世契约']?.img || '',
         type: 'tame',
         effect: { type: 'all' },
         quantity: 1,
@@ -350,6 +351,7 @@ function executeCommand(cmd) {
       inventoryStore.addItem({
         name: '生命之水',
         icon: ITEMS['生命之水']?.icon || '',
+        img: ITEMS['生命之水']?.img || '',
         type: 'heal',
         effect: { healPercent: 1 },
         quantity: 1,
@@ -365,6 +367,7 @@ function executeCommand(cmd) {
       inventoryStore.addItem({
         name: '附魔之水',
         icon: ITEMS['附魔之水']?.icon || '',
+        img: ITEMS['附魔之水']?.img || '',
         type: 'mana',
         effect: { manaPercent: 1 },
         quantity: 1,

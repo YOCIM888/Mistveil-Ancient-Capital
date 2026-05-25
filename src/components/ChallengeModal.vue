@@ -91,6 +91,7 @@
 import { ref, computed } from 'vue'
 import { usePlayerStore } from '@/stores/player'
 import { usePetStore } from '@/stores/pet'
+import { useDungeonStore } from '@/stores/dungeon'
 import { generatePvPOpponent, generateEndlessMonster, generateBossEvolution } from '@/utils/game'
 import { BOSS_MONSTERS } from '@/data/monsters'
 
@@ -105,6 +106,7 @@ const emit = defineEmits(['update:modelValue', 'startBattle'])
 
 const playerStore = usePlayerStore()
 const petStore = usePetStore()
+const dungeonStore = useDungeonStore()
 
 const showBossPanel = ref(false)
 const previewBoss = ref(null)
@@ -130,7 +132,7 @@ const availableBosses = computed(() => {
     .map((f) => {
       const data = BOSS_MONSTERS[f]
       if (!data) return null
-      const isCleared = playerStore.clearedFloors.includes(f)
+      const isCleared = dungeonStore.isFloorCleared(f)
       const evoCount = playerStore.bossEvolutionCounts?.[data.name] || 0
       const multiplier = Math.pow(2, evoCount + 1)
       return {

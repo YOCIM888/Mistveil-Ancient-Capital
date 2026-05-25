@@ -1022,10 +1022,11 @@ watch(() => props.modelValue, (val) => {
 }
 
 .equip-img {
-  width: 80%;
-  height: 80%;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 6px;
+  image-rendering: crisp-edges;
 }
 
 .equip-lv {
@@ -1121,11 +1122,12 @@ watch(() => props.modelValue, (val) => {
 }
 
 .item-img {
-  width: 85%;
-  height: 85%;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 4px;
   pointer-events: none;
+  image-rendering: crisp-edges;
 }
 
 .item-qty {
@@ -1134,8 +1136,8 @@ watch(() => props.modelValue, (val) => {
   right: 3px;
   font-size: 0.55rem;
   font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  color: #ffd700;
+  text-shadow: 0 0 3px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .item-rarity-bar {

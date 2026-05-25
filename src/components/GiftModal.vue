@@ -33,7 +33,13 @@
                 :key="idx"
                 class="gift-content-item"
               >
-                <span class="content-icon">{{ getItemIcon(item) }}</span>
+                <img
+                  v-if="getItemImg(item)"
+                  :src="getItemImg(item)"
+                  :alt="item.name"
+                  class="content-img"
+                />
+                <span v-else class="content-icon">{{ getItemIcon(item).icon }}</span>
                 <span class="content-name">{{ item.name }}</span>
                 <span v-if="item.quantity > 1" class="content-qty">×{{ item.quantity }}</span>
               </div>
@@ -128,11 +134,19 @@ function buyButtonText(pack) {
 function getItemIcon(item) {
   if (item.type === 'equipment') {
     const eq = EQUIPMENT[item.name]
-    const rarityIcons = { blue: '🔵', purple: '🟣', orange: '🟠', red: '🔴' }
-    return rarityIcons[eq?.rarity] || '⚔️'
+    return { icon: '⚔️', img: eq?.img || '' }
   }
   const it = ITEMS[item.name]
-  return it?.icon || '📦'
+  return { icon: it?.icon || '📦', img: it?.img || '' }
+}
+
+function getItemImg(item) {
+  if (item.type === 'equipment') {
+    const eq = EQUIPMENT[item.name]
+    return eq?.img || ''
+  }
+  const it = ITEMS[item.name]
+  return it?.img || ''
 }
 
 function buyGift(key, pack) {
@@ -158,6 +172,7 @@ function buyGift(key, pack) {
         inventoryStore.addItem({
           name: eq.name,
           icon: '',
+          img: eq.img || '',
           type: 'equipment',
           itemType: eq.type,
           rarity: eq.rarity || 'common',
@@ -356,6 +371,14 @@ function buyGift(key, pack) {
 
 .content-icon {
   font-size: 0.85rem;
+}
+
+.content-img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 4px;
+  image-rendering: crisp-edges;
 }
 
 .content-name {

@@ -41,8 +41,7 @@ export const useDungeonStore = defineStore('dungeon', () => {
 
     if (u.clearedFloors.includes(floorNum)) return false
 
-    u.clearedFloors.push(floorNum)
-    u.clearedFloors.sort((a, b) => a - b)
+    u.clearedFloors = [...u.clearedFloors, floorNum].sort((a, b) => a - b)
     auth.saveAccounts()
     return true
   }

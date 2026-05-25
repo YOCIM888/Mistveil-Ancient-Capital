@@ -6,19 +6,21 @@
         <button class="modal-close" @click="close">✕</button>
       </div>
 
-      <div class="tabs-scroll">
-        <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          class="tab-btn"
-          :class="{ active: activeTab === tab.key }"
-          @click="activeTab = tab.key"
-        >
-          {{ tab.label }}
-        </button>
-      </div>
+      <div class="shop-body">
+        <div class="shop-sidebar">
+          <div
+            v-for="tab in tabs"
+            :key="tab.key"
+            class="sidebar-tab"
+            :class="{ active: activeTab === tab.key }"
+            @click="activeTab = tab.key"
+          >
+            {{ tab.sideLabel || tab.label }}
+          </div>
+        </div>
 
-      <div class="items-grid">
+        <div class="shop-main">
+          <div class="items-grid">
         <div
           v-for="item in filteredItems"
           :key="item.name"
@@ -72,6 +74,8 @@
           <span class="currency-value">{{ playerStore.evolutionCoin }}</span>
         </div>
       </div>
+        </div>
+      </div>
     </div>
 
     <div v-if="selectedItem" class="modal-overlay confirm-overlay" @click.self="selectedItem = null">
@@ -82,8 +86,20 @@
             {{ selectedItem.name }}
           </p>
           <p class="confirm-price">
-            价格：<span class="currency-icon">{{ currencyIcon(selectedItem.currency || 'gold') }}</span>
+            单价：<span class="currency-icon">{{ currencyIcon(selectedItem.currency || 'gold') }}</span>
             <strong>{{ selectedItem.price }}</strong>
+          </p>
+          <div v-if="!isEquipment(selectedItem)" class="qty-row">
+            <span class="qty-label">数量：</span>
+            <div class="qty-stepper">
+              <button class="qty-btn" @click="purchaseQuantity > 1 && purchaseQuantity--" :disabled="purchaseQuantity <= 1">−</button>
+              <span class="qty-value">{{ purchaseQuantity }}</span>
+              <button class="qty-btn" @click="purchaseQuantity < maxAffordable && purchaseQuantity++" :disabled="purchaseQuantity >= maxAffordable">+</button>
+            </div>
+          </div>
+          <p class="confirm-total">
+            总价：<span class="currency-icon">{{ currencyIcon(selectedItem.currency || 'gold') }}</span>
+            <strong>{{ selectedItem.price * purchaseQuantity }}</strong>
           </p>
         </div>
         <div class="confirm-actions">
@@ -101,6 +117,7 @@ import { usePlayerStore } from '@/stores/player'
 import { useInventoryStore } from '@/stores/inventory'
 import { EQUIPMENT, EQUIPMENT_RARITY } from '@/data/equipment'
 import { ITEMS } from '@/data/items'
+import { showToast } from '@/utils/toast'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false }
@@ -113,21 +130,22 @@ const inventoryStore = useInventoryStore()
 
 const activeTab = ref('all')
 const selectedItem = ref(null)
+const purchaseQuantity = ref(1)
 
 const equipmentList = Object.values(EQUIPMENT)
 const itemList = Object.values(ITEMS)
 
 const tabs = [
-  { key: 'all', label: '全部' },
-  { key: 'classSet', label: '职业套装' },
-  { key: 'traveler', label: '旅人套' },
-  { key: 'ocean', label: '🌊 洋流套' },
-  { key: 'angel', label: '👼 天使套' },
-  { key: 'emperor', label: '帝套' },
-  { key: 'dark', label: '💀 暗黑套' },
-  { key: 'dragon', label: '🐉 龙神套' },
-  { key: 'creation', label: '创世套' },
-  { key: 'items', label: '道具' }
+  { key: 'all', label: '全部', sideLabel: '全' },
+  { key: 'classSet', label: '职业套装', sideLabel: '职' },
+  { key: 'traveler', label: '旅人套', sideLabel: '旅' },
+  { key: 'ocean', label: '🌊 洋流套', sideLabel: '洋' },
+  { key: 'angel', label: '👼 天使套', sideLabel: '天' },
+  { key: 'emperor', label: '帝套', sideLabel: '帝' },
+  { key: 'dark', label: '💀 暗黑套', sideLabel: '暗' },
+  { key: 'dragon', label: '🐉 龙神套', sideLabel: '龙' },
+  { key: 'creation', label: '创世套', sideLabel: '世' },
+  { key: 'items', label: '道具', sideLabel: '道' }
 ]
 
 const PROP_LABELS = {
@@ -137,6 +155,7 @@ const PROP_LABELS = {
   speed: '速度',
   magic: '魔力',
   criticalRate: '暴击率',
+  critDamage: '爆伤',
   dodgeRate: '闪避率',
   magicRegen: '魔力回复',
   goldBonus: '金币加成'
@@ -198,6 +217,18 @@ function rarityColor(rarity) {
   return map[rarity] || '#aaa'
 }
 
+const maxAffordable = computed(() => {
+  const item = selectedItem.value
+  if (!item || item.price === null || item.price === 0) return 1
+  if (isEquipment(item)) return 1
+  const currency = item.currency || 'gold'
+  let balance = 0
+  if (currency === 'gold') balance = playerStore.gold
+  else if (currency === 'diamond') balance = playerStore.diamond
+  else if (currency === 'evoCoin') balance = playerStore.evolutionCoin
+  return Math.max(1, Math.floor(balance / item.price))
+})
+
 function currencyIcon(currency) {
   const map = {
     gold: '💰',
@@ -214,6 +245,7 @@ function isEquipment(item) {
 function selectItem(item) {
   if (item.price === null) return
   selectedItem.value = item
+  purchaseQuantity.value = 1
 }
 
 function canAddToBackpack(item) {
@@ -231,7 +263,8 @@ function confirmPurchase() {
   if (!item || item.price === null) return
 
   const currency = item.currency || 'gold'
-  const price = item.price
+  const qty = isEquipment(item) ? 1 : purchaseQuantity.value
+  const totalPrice = item.price * qty
 
   let currentBalance = 0
 
@@ -243,8 +276,8 @@ function confirmPurchase() {
     currentBalance = playerStore.evolutionCoin
   }
 
-  if (currentBalance < price) {
-    alert('余额不足！')
+  if (currentBalance < totalPrice) {
+    showToast('余额不足！')
     return
   }
 
@@ -268,32 +301,32 @@ function confirmPurchase() {
         type: item.type || 'consumable',
         itemType: item.itemType || 'other',
         effect: item.effect || null,
-        quantity: 1
+        quantity: qty
       }
 
   if (!canAddToBackpack(newItem)) {
-    alert('背包已满！')
+    showToast('背包已满！')
     return
   }
 
   if (currency === 'gold') {
-    playerStore.gold = playerStore.gold - price
+    playerStore.gold = playerStore.gold - totalPrice
   } else if (currency === 'diamond') {
-    playerStore.diamond = playerStore.diamond - price
+    playerStore.diamond = playerStore.diamond - totalPrice
   } else if (currency === 'evoCoin') {
-    playerStore.evolutionCoin = playerStore.evolutionCoin - price
+    playerStore.evolutionCoin = playerStore.evolutionCoin - totalPrice
   }
 
   const added = inventoryStore.addItem(newItem)
   if (!added) {
     if (currency === 'gold') {
-      playerStore.gold = playerStore.gold + price
+      playerStore.gold = playerStore.gold + totalPrice
     } else if (currency === 'diamond') {
-      playerStore.diamond = playerStore.diamond + price
+      playerStore.diamond = playerStore.diamond + totalPrice
     } else if (currency === 'evoCoin') {
-      playerStore.evolutionCoin = playerStore.evolutionCoin + price
+      playerStore.evolutionCoin = playerStore.evolutionCoin + totalPrice
     }
-    alert('背包已满！')
+    showToast('背包已满！')
     return
   }
 
@@ -329,8 +362,8 @@ function close() {
 
 .modal-content {
   width: 90%;
-  max-width: 520px;
-  max-height: 85vh;
+  max-width: 540px;
+  height: 85vh;
   background: linear-gradient(180deg, #2a2a32, #1a1a22);
   border-radius: 20px;
   border: 1px solid rgba(180, 180, 195, 0.25);
@@ -392,52 +425,74 @@ function close() {
 }
 
 .tabs-scroll {
+  display: none;
+}
+
+.shop-body {
+  flex: 1;
   display: flex;
-  gap: 6px;
-  padding: 12px 16px;
-  overflow-x: auto;
+  flex-direction: row;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.shop-sidebar {
+  width: 36px;
   flex-shrink: 0;
-  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-right: 1px solid rgba(120, 180, 220, 0.3);
+  background: rgba(5, 15, 25, 0.5);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.tabs-scroll::-webkit-scrollbar {
-  height: 4px;
+.shop-sidebar::-webkit-scrollbar {
+  display: none;
 }
 
-.tabs-scroll::-webkit-scrollbar-track {
-  background: rgba(10, 30, 50, 0.4);
-  border-radius: 2px;
-}
-
-.tabs-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(90deg, #4a8ab8, #2a5a80);
-  border-radius: 2px;
-}
-
-.tab-btn {
-  flex-shrink: 0;
-  padding: 6px 14px;
-  border-radius: 16px;
-  border: 1.5px solid rgba(120, 180, 220, 0.4);
-  background: rgba(10, 35, 55, 0.8);
-  color: #b0d0f0;
-  font-size: 0.85rem;
-  font-weight: 600;
+.sidebar-tab {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1.5px solid rgba(120, 180, 220, 0.35);
+  background: rgba(10, 35, 55, 0.7);
+  color: #90b8d8;
+  font-size: 0.8rem;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  white-space: nowrap;
+  writing-mode: vertical-rl;
+  letter-spacing: 2px;
+  user-select: none;
 }
 
-.tab-btn:hover {
+.sidebar-tab:hover {
   border-color: rgba(150, 210, 255, 0.7);
   background: rgba(20, 50, 80, 0.85);
+  color: #d0e8ff;
 }
 
-.tab-btn.active {
+.sidebar-tab.active {
   background: linear-gradient(135deg, #2a6a9a, #1a4a6a);
   border-color: rgba(150, 210, 255, 0.8);
   color: #fff;
   box-shadow: 0 0 12px rgba(80, 160, 220, 0.4);
+}
+
+.shop-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
 }
 
 .items-grid {
@@ -445,8 +500,8 @@ function close() {
   overflow-y: auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  padding: 4px 16px 8px;
+  gap: 8px;
+  padding: 8px 10px 4px;
   align-content: start;
 }
 
@@ -581,8 +636,8 @@ function close() {
 .currency-bar {
   display: flex;
   justify-content: center;
-  gap: 16px;
-  padding: 12px 20px;
+  gap: 10px;
+  padding: 8px 10px;
   border-top: 1px solid rgba(120, 180, 220, 0.3);
   flex-shrink: 0;
 }
@@ -712,5 +767,82 @@ function close() {
 
 .btn-confirm:active {
   transform: scale(0.96);
+}
+
+/* ---------- Quantity Stepper ---------- */
+.qty-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.qty-label {
+  font-size: 0.9rem;
+  color: #b0d0e8;
+  font-weight: 600;
+}
+
+.qty-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid rgba(120, 180, 220, 0.4);
+}
+
+.qty-btn {
+  width: 32px;
+  height: 30px;
+  border: none;
+  background: rgba(20, 50, 80, 0.7);
+  color: #b0d0f0;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-btn:hover:not(:disabled) {
+  background: rgba(40, 80, 120, 0.85);
+  color: #fff;
+}
+
+.qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.qty-value {
+  min-width: 40px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 30, 50, 0.8);
+  color: #ffd76e;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border-left: 1px solid rgba(120, 180, 220, 0.3);
+  border-right: 1px solid rgba(120, 180, 220, 0.3);
+}
+
+.confirm-total {
+  color: #c0d8f0;
+  font-size: 0.95rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.confirm-total strong {
+  color: #ffd76e;
+  font-size: 1.05rem;
 }
 </style>

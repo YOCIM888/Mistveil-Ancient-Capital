@@ -260,13 +260,16 @@ const equipmentCollected = computed(() => {
   const backpack = inventoryStore.backpackItems || []
   const equipped = inventoryStore.equippedItems || {}
   const collectedNames = new Set()
-  backpack.forEach(item => collectedNames.add(item.name))
-  Object.values(equipped).forEach(item => { if (item) collectedNames.add(item.name) })
+  backpack.forEach(item => { if (EQUIPMENT[item.name]) collectedNames.add(item.name) })
+  Object.values(equipped).forEach(item => { if (item && EQUIPMENT[item.name]) collectedNames.add(item.name) })
   return collectedNames.size
 })
 const equipmentTotal = computed(() => allEquipment.value.length)
 
-const itemsCollected = computed(() => inventoryStore.collectedItems.length)
+const itemsCollected = computed(() => {
+  // 只统计 ITEMS 数据中存在的道具，排除装备名
+  return inventoryStore.collectedItems.filter(name => ITEMS[name]).length
+})
 const itemsTotal = computed(() => allItems.value.length)
 
 function isEquipmentCollected(name) {
@@ -374,7 +377,7 @@ function onImgError(e) {
 .codex-content {
   width: 92%;
   max-width: 440px;
-  max-height: 85vh;
+  height: 85vh;
   background: linear-gradient(135deg, rgba(20, 20, 25, 0.98), rgba(10, 10, 15, 0.98));
   border-radius: 20px;
   border: 1.5px solid rgba(120, 110, 90, 0.5);

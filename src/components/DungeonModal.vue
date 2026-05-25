@@ -129,7 +129,7 @@ function onFloorClick(floorNum) {
 .dungeon-modal {
   width: 92%;
   max-width: 480px;
-  max-height: 85vh;
+  height: 85vh;
   background: linear-gradient(180deg, #2a2a32, #1a1a22);
   border-radius: 20px;
   border: 1px solid rgba(180, 180, 195, 0.25);

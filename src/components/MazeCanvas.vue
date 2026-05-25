@@ -91,15 +91,15 @@ function draw() {
 
       switch (cell) {
         case 0: // wall
-          ctx.fillStyle = '#1a2030'
+          ctx.fillStyle = '#0d1117'
           ctx.fillRect(cx, cy, cellSize, cellSize)
-          ctx.fillStyle = '#252d3e'
+          ctx.fillStyle = '#161b24'
           ctx.fillRect(cx + 1, cy + 1, cellSize - 2, cellSize - 2)
           break
         case 1: // path
-          ctx.fillStyle = '#1a2235'
+          ctx.fillStyle = '#1a2a3a'
           ctx.fillRect(cx, cy, cellSize, cellSize)
-          ctx.fillStyle = '#1e2840'
+          ctx.fillStyle = '#243548'
           ctx.fillRect(cx + 1, cy + 1, cellSize - 2, cellSize - 2)
           break
         case 2: // monster

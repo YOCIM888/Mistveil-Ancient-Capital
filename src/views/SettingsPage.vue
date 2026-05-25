@@ -157,15 +157,15 @@ function goToVillage() {
 
 function handleLogout() {
   auth.logout()
-  router.push('/')
+  window.location.href = '/index.html'
 }
 </script>
 
 <style scoped>
 .settings-page {
   width: 100%;
-  min-height: 100vh;
-  background: #0b1a26 url('/image/main/冰封王国.webp') no-repeat center center fixed;
+  height: 100vh;
+  background: #0b1a26 url('/image/main/千雾古都.webp') no-repeat center center fixed;
   background-size: cover;
   display: flex;
   align-items: center;
@@ -176,17 +176,18 @@ function handleLogout() {
 .settings-container {
   width: 100%;
   max-width: 420px;
-  min-height: 100vh;
+  height: 100vh;
   margin: 0 auto;
   background: rgba(20, 20, 26, 0.55);
   box-shadow: 0 0 30px #00000070;
-  padding: 20px 16px 30px;
+  padding: 12px 16px 16px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 8px;
   border-left: 1px solid rgba(200, 200, 210, 0.12);
   border-right: 1px solid rgba(200, 200, 210, 0.12);
   color: #d8d8e0;
+  overflow-y: auto;
 }
 
 h2 {
@@ -195,46 +196,50 @@ h2 {
   text-shadow: 0 4px 8px black;
   letter-spacing: 4px;
   font-weight: 400;
+  font-size: 1.1rem;
   border-bottom: 1px solid #4a4a55;
-  padding-bottom: 12px;
+  padding-bottom: 8px;
   margin: 0;
+  flex-shrink: 0;
 }
 
 .avatar-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .avatar-preview {
-  width: 90px;
-  height: 90px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  border: 3px solid rgba(180, 180, 195, 0.5);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(180, 180, 195, 0.5);
+  box-shadow: 0 0 16px rgba(0, 0, 0, 0.4);
   object-fit: cover;
   background: #132c3f;
   cursor: pointer;
 }
 
 .upload-hint {
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   color: #a0a0a8;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   background: rgba(30, 30, 36, 0.6);
-  padding: 12px 16px;
-  border-radius: 28px;
+  padding: 8px 14px;
+  border-radius: 20px;
   border: 1px solid rgba(180, 180, 195, 0.25);
+  flex-shrink: 0;
 }
 
 .form-label {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #c0c0c8;
   letter-spacing: 1px;
 }
@@ -243,9 +248,9 @@ h2 {
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid #4a4a55;
   border-radius: 40px;
-  padding: 10px 16px;
+  padding: 8px 14px;
   color: white;
-  font-size: 1rem;
+  font-size: 0.9rem;
   outline: none;
 }
 
@@ -256,47 +261,48 @@ h2 {
 
 .radio-group {
   display: flex;
-  gap: 24px;
+  gap: 20px;
   align-items: center;
 }
 
 .radio-group label {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   color: #c8c8d0;
   cursor: pointer;
+  font-size: 0.85rem;
 }
 
 .static-text {
-  padding: 10px 16px;
+  padding: 8px 14px;
   color: #d8d8e0;
   font-weight: 500;
+  font-size: 0.9rem;
 }
 
 .btn {
   background: linear-gradient(145deg, #4a4a55, #2a2a32);
   border: 1px solid #7a7a85;
   border-radius: 60px;
-  padding: 14px 18px;
+  padding: 10px 18px;
   color: white;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 5px 0 #1a1a22, 0 4px 10px black;
+  box-shadow: 0 4px 0 #1a1a22, 0 3px 8px black;
   transition: 0.08s;
-  margin-top: 10px;
+  flex-shrink: 0;
 }
 
 .btn:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 #1a1a22, 0 4px 10px black;
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #1a1a22, 0 3px 8px black;
 }
 
 .back-btn {
   background: #3a4a5a;
-  margin-top: 8px;
 }
 .back-btn:hover {
   background: #4a5a6a;
@@ -305,12 +311,14 @@ h2 {
 .logout-btn {
   background: linear-gradient(145deg, #5a3a3a, #3a1e1e);
   border-color: #a08080;
-  box-shadow: 0 5px 0 #2a1515, 0 4px 10px black;
+  box-shadow: 0 4px 0 #2a1515, 0 3px 8px black;
 }
 
 .message {
-  min-height: 24px;
+  min-height: 18px;
   color: #e8b0a0;
   text-align: center;
+  font-size: 0.8rem;
+  flex-shrink: 0;
 }
 </style>

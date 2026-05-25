@@ -308,6 +308,26 @@ export const useInventoryStore = defineStore('inventory', () => {
     const items = [...u.backpackItems]
 
     switch (sortBy) {
+      case 'quality': {
+        const rarityOrder = { red: 0, legendary: 1, orange: 1, epic: 2, purple: 2, rare: 3, blue: 3, uncommon: 4, common: 5 }
+        const isEquip = (item) => {
+          if (!item) return false
+          if (item.type === 'equipment') return true
+          const equipTypes = ['weapon', 'head', 'chest', 'legs', 'boots', 'accessory']
+          return equipTypes.includes(item.itemType)
+        }
+        items.sort((a, b) => {
+          const aIsEquip = isEquip(a)
+          const bIsEquip = isEquip(b)
+          if (aIsEquip && !bIsEquip) return -1
+          if (!aIsEquip && bIsEquip) return 1
+          if (aIsEquip && bIsEquip) {
+            return (rarityOrder[a.rarity] ?? 6) - (rarityOrder[b.rarity] ?? 6)
+          }
+          return (a.name || '').localeCompare(b.name || '')
+        })
+        break
+      }
       case 'type':
         items.sort((a, b) => (a.type || '').localeCompare(b.type || ''))
         break

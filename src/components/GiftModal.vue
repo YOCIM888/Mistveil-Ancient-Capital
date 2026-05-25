@@ -71,6 +71,7 @@ import { useInventoryStore } from '@/stores/inventory'
 import { GIFTPACKS } from '@/data/shop'
 import { EQUIPMENT } from '@/data/equipment'
 import { ITEMS } from '@/data/items'
+import { showToast, showConfirm } from '@/utils/toast'
 
 const props = defineProps({
   modelValue: {
@@ -149,13 +150,13 @@ function getItemImg(item) {
   return it?.img || ''
 }
 
-function buyGift(key, pack) {
+async function buyGift(key, pack) {
   if (isLimitReached(pack)) return
   if (!canAfford(pack)) return
 
   if (pack.price > 0) {
     const currencyName = pack.currency === 'diamond' ? '钻石' : '金币'
-    const confirmed = confirm(`确定要花费 ${pack.price} ${currencyName} 购买「${pack.name}」吗？`)
+    const confirmed = await showConfirm(`确定要花费 ${pack.price} ${currencyName} 购买「${pack.name}」吗？`)
     if (!confirmed) return
   }
 
@@ -196,7 +197,7 @@ function buyGift(key, pack) {
   }
 
   playerStore.recordGiftPurchase(pack.id)
-  alert(`成功购买「${pack.name}」！`)
+  showToast(`成功购买「${pack.name}」！`)
 }
 </script>
 
@@ -225,7 +226,7 @@ function buyGift(key, pack) {
 .modal-content {
   width: 90%;
   max-width: 440px;
-  max-height: 85vh;
+  height: 85vh;
   background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(10, 10, 10, 0.98));
   border-radius: 20px;
   border: 1.5px solid rgba(160, 160, 160, 0.5);
@@ -233,7 +234,9 @@ function buyGift(key, pack) {
     0 20px 60px rgba(0, 0, 0, 0.7),
     0 0 40px rgba(0, 0, 0, 0.4),
     inset 0 1px 3px rgba(255, 255, 255, 0.1);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   animation: modalPopIn 0.25s ease-out;
 }
 
@@ -254,6 +257,7 @@ function buyGift(key, pack) {
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid rgba(120, 180, 220, 0.3);
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -287,6 +291,9 @@ function buyGift(key, pack) {
 
 .modal-body {
   padding: 16px 20px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .gift-grid {

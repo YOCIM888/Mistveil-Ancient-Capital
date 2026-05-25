@@ -134,6 +134,7 @@ import { useInventoryStore } from '@/stores/inventory'
 import { generateMistIslandMaze } from '@/utils/maze'
 import MazeCanvas from '@/components/MazeCanvas.vue'
 import BattleModal from '@/components/BattleModal.vue'
+import { showToast } from '@/utils/toast'
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false }
@@ -304,7 +305,7 @@ function onBattleVictory(rewards) {
     playerStore.addDiamond(randInt(5, 15))
     playerStore.addExp(randInt(200, 500))
     dialogType.value = null
-    alert('🏆 恭喜通关迷雾岛！\n\n击败了' + monster.name + '！\n获得大量金币、钻石和经验奖励！')
+    showToast('🏆 恭喜通关迷雾岛！\n\n击败了' + monster.name + '！\n获得大量金币、钻石和经验奖励！')
     handleClose()
   }
 }
@@ -394,9 +395,12 @@ function randInt(min, max) {
 .mist-panel {
   width: 460px;
   max-width: 95vw;
+  height: 85vh;
   background: linear-gradient(180deg, #1a1f2e, #0d1117);
   border: 1px solid rgba(100, 140, 180, 0.3);
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -407,6 +411,7 @@ function randInt(min, max) {
   padding: 8px 14px;
   background: rgba(10, 20, 30, 0.8);
   border-bottom: 1px solid rgba(80, 120, 160, 0.2);
+  flex-shrink: 0;
 }
 
 .mist-label {
@@ -434,8 +439,12 @@ function randInt(min, max) {
 }
 
 .mist-canvas-wrap {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
   padding: 4px;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 

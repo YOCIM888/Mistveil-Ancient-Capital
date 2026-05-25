@@ -320,8 +320,10 @@ onBeforeUnmount(() => {
 .home-panel {
   width: 90%;
   max-width: 380px;
-  max-height: 85vh;
-  overflow-y: auto;
+  height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   background: linear-gradient(180deg, #2c2c34, #1a1a20);
   border: 1px solid rgba(180, 180, 200, 0.25);
   border-radius: 16px;
@@ -335,6 +337,7 @@ onBeforeUnmount(() => {
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 12px;
+  flex-shrink: 0;
 }
 .home-header h3 {
   font-size: 1rem;
@@ -380,6 +383,7 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 6px;
   margin-bottom: 14px;
+  flex-shrink: 0;
 }
 .tab-btn {
   flex: 1;
@@ -400,7 +404,9 @@ onBeforeUnmount(() => {
 }
 
 .game-area {
-  min-height: 160px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 .game-info {
   font-size: 0.8rem;
@@ -549,5 +555,6 @@ onBeforeUnmount(() => {
   color: #e0c880;
   font-size: 0.85rem;
   font-weight: 600;
+  flex-shrink: 0;
 }
 </style>

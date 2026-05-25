@@ -77,6 +77,7 @@
 import { computed } from 'vue'
 import { usePlayerStore } from '@/stores/player'
 import { TALENTS } from '@/data/talents'
+import { showConfirm } from '@/utils/toast'
 
 const props = defineProps({
   modelValue: {
@@ -123,17 +124,17 @@ function upgrade(talentId) {
   playerStore.addTalent(talentId)
 }
 
-function resetWithDiamond() {
+async function resetWithDiamond() {
   if (playerStore.diamond < 5) return
-  const confirmed = confirm('确定要花费 5 💎 重置所有天赋吗？天赋点将全部返还。')
+  const confirmed = await showConfirm('确定要花费 5 💎 重置所有天赋吗？天赋点将全部返还。')
   if (!confirmed) return
   playerStore.diamond -= 5
   playerStore.resetTalents()
 }
 
-function resetWithGold() {
+async function resetWithGold() {
   if (playerStore.gold < 5000) return
-  const confirmed = confirm('确定要花费 5000 💰 重置所有天赋吗？天赋点将全部返还。')
+  const confirmed = await showConfirm('确定要花费 5000 💰 重置所有天赋吗？天赋点将全部返还。')
   if (!confirmed) return
   playerStore.gold -= 5000
   playerStore.resetTalents()
@@ -165,12 +166,14 @@ function resetWithGold() {
 .talent-modal {
   width: 90%;
   max-width: 440px;
-  max-height: 85vh;
+  height: 85vh;
   background: linear-gradient(180deg, #2a2a32, #1a1a22);
   border-radius: 20px;
   border: 1px solid rgba(180, 180, 195, 0.25);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   animation: modalPopIn 0.25s ease-out;
 }
 
@@ -191,6 +194,7 @@ function resetWithGold() {
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid rgba(120, 180, 220, 0.3);
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -224,6 +228,9 @@ function resetWithGold() {
 
 .modal-body {
   padding: 16px 20px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .points-display {

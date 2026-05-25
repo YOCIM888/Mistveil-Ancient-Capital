@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed } from 'vue'
 import { useAuthStore } from './auth'
-import { RUNE_TYPES } from '@/data/runes'
+import { RUNE_TYPES, RUNE_LEVELS } from '@/data/runes'
 
 export const useRuneStore = defineStore('rune', () => {
   const auth = useAuthStore()
@@ -213,55 +213,54 @@ export const useRuneStore = defineStore('rune', () => {
     if (!u) return { composed: 0, message: '未登录' }
     if (!u.runes || u.runes.length < 2) return { composed: 0, message: '符文不足，无法合成' }
 
+    const activeRuneIds = new Set((u.activeRunes || []).filter(Boolean).map(ar => ar.id))
+
+    // 按 type_level 分组（排除已装备符文）
+    const groups = new Map()
+    for (const r of u.runes) {
+      if (activeRuneIds.has(r.id)) continue
+      const key = `${r.type}_${r.level || 1}`
+      if (!groups.has(key)) groups.set(key, [])
+      groups.get(key).push(r)
+    }
+
     let composed = 0
-    let keepComposing = true
+    const removeIds = new Set()
+    const newRunes = []
 
-    while (keepComposing) {
-      keepComposing = false
-      const groups = {}
-
-      const activeRuneIds = new Set((u.activeRunes || []).filter(Boolean).map(ar => ar.id))
-      for (const r of u.runes) {
-        if (activeRuneIds.has(r.id)) continue
-        const key = `${r.type}_${r.level || 1}`
-        if (!groups[key]) groups[key] = []
-        groups[key].push(r)
-      }
-
-      for (const [key, group] of Object.entries(groups)) {
-        if (group.length >= 2) {
-          const [r1, r2] = group
-          const idx1 = u.runes.indexOf(r1)
-          const idx2 = u.runes.indexOf(r2)
-          if (idx1 === -1 || idx2 === -1) continue
-
-          const maxIdx = Math.max(idx1, idx2)
-          const minIdx = Math.min(idx1, idx2)
-          u.runes.splice(maxIdx, 1)
-          u.runes.splice(minIdx, 1)
-
-          const newLevel = Math.min((r1.level || 1) + 1, 10)
-          const typeInfo = RUNE_TYPES[group[0].type]
-          u.runes.push({
-            id: `rune_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-            type: group[0].type,
-            level: newLevel,
-            name: typeInfo?.name || group[0].name,
-            icon: typeInfo?.icon || '',
-            color: typeInfo?.color || '#888888',
-          })
-
-          composed++
-          keepComposing = true
-          break
-        }
+    for (const [key, group] of groups) {
+      const pairs = Math.floor(group.length / 2)
+      for (let i = 0; i < pairs; i++) {
+        const r1 = group[i * 2]
+        const r2 = group[i * 2 + 1]
+        if (!r1 || !r2) continue
+        removeIds.add(r1.id)
+        removeIds.add(r2.id)
+        const newLevel = Math.min((r1.level || 1) + 1, 10)
+        const typeInfo = RUNE_TYPES[r1.type]
+        newRunes.push({
+          id: `rune_${Date.now()}_${Math.random().toString(36).slice(2, 8)}_c${composed}`,
+          type: r1.type,
+          level: newLevel,
+          name: typeInfo?.name || r1.name,
+          icon: typeInfo?.icon || '',
+          color: typeInfo?.color || '#888888',
+        })
+        composed++
       }
     }
 
+    if (composed === 0) return { composed: 0, message: '没有可合成的符文' }
+
+    // 原子替换：一次性过滤 + 追加
+    u.runes = u.runes.filter(r => !removeIds.has(r.id))
+    u.runes.push(...newRunes)
+
+    // 清理已装备但被合成的符文
     if (u.activeRunes) {
-      const currentRuneIds = new Set(u.runes.map(r => r.id))
+      const currentIds = new Set(u.runes.map(r => r.id))
       u.activeRunes = u.activeRunes.map(ar => {
-        if (ar && !currentRuneIds.has(ar.id)) return null
+        if (ar && !currentIds.has(ar.id)) return null
         return ar
       })
     }
@@ -269,7 +268,7 @@ export const useRuneStore = defineStore('rune', () => {
     auth.saveAccounts()
     return {
       composed,
-      message: composed > 0 ? `一键合成完成，共合成 ${composed} 次` : '没有可合成的符文'
+      message: `一键合成完成，共合成 ${composed} 次`
     }
   }
 

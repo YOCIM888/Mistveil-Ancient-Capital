@@ -68,7 +68,7 @@
                 进化次数: {{ boss.evoCount }}
               </div>
               <div v-if="!boss.isCleared" class="boss-locked-hint">通关该层后可挑战</div>
-              <div v-if="previewBoss === boss && boss.isCleared" class="boss-preview">
+              <div v-if="previewBoss && previewBoss.floor === boss.floor && boss.isCleared" class="boss-preview">
                 <div class="preview-label">预览超进化</div>
                 <div class="preview-stats">
                   <span>生命: {{ boss.originalHp }} → {{ boss.previewHp }}</span>
@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { usePlayerStore } from '@/stores/player'
 import { usePetStore } from '@/stores/pet'
 import { useDungeonStore } from '@/stores/dungeon'
@@ -109,7 +109,21 @@ const petStore = usePetStore()
 const dungeonStore = useDungeonStore()
 
 const showBossPanel = ref(false)
-const previewBoss = ref(null)
+const previewBossFloor = ref(null)
+
+watch(() => props.modelValue, (val) => {
+  if (!val) {
+    showBossPanel.value = false
+    previewBossFloor.value = null
+  }
+})
+
+watch(showBossPanel, (val) => {
+  if (val) {
+    const firstCleared = availableBosses.value.find(b => b.isCleared)
+    previewBossFloor.value = firstCleared ? firstCleared.floor : null
+  }
+})
 
 function close() {
   emit('update:modelValue', false)
@@ -132,7 +146,7 @@ const availableBosses = computed(() => {
     .map((f) => {
       const data = BOSS_MONSTERS[f]
       if (!data) return null
-      const isCleared = dungeonStore.isFloorCleared(f)
+      const isCleared = dungeonStore.clearedFloors.includes(f)
       const evoCount = playerStore.bossEvolutionCounts?.[data.name] || 0
       const multiplier = Math.pow(2, evoCount + 1)
       return {
@@ -152,12 +166,13 @@ const availableBosses = computed(() => {
 })
 
 function onBossSelect(boss) {
-  if (previewBoss.value === boss) {
-    previewBoss.value = null
-  } else {
-    previewBoss.value = boss
-  }
+  previewBossFloor.value = boss.floor
 }
+
+const previewBoss = computed(() => {
+  if (previewBossFloor.value === null) return null
+  return availableBosses.value.find(b => b.floor === previewBossFloor.value) || null
+})
 
 function onStartBossEvo(boss) {
   const evoCount = boss.evoCount + 1
@@ -192,12 +207,14 @@ function onStartBossEvo(boss) {
 .modal-content {
   width: 90%;
   max-width: 440px;
-  max-height: 85vh;
+  height: 85vh;
   background: linear-gradient(180deg, #2a2a32, #1a1a22);
   border-radius: 20px;
   border: 1px solid rgba(180, 180, 195, 0.25);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   position: relative;
   animation: modalPopIn 0.25s ease-out;
 }
@@ -219,6 +236,7 @@ function onStartBossEvo(boss) {
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid rgba(120, 180, 220, 0.3);
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -252,6 +270,9 @@ function onStartBossEvo(boss) {
 
 .modal-body {
   padding: 16px 20px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* ---------- Mode Cards ---------- */

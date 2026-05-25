@@ -69,11 +69,6 @@
                 v-if="getSlotItem(i - 1).quantity > 1"
                 class="item-qty"
               >{{ getSlotItem(i - 1).quantity }}</span>
-              <span
-                v-if="getSlotItem(i - 1).rarity"
-                class="item-rarity-bar"
-                :style="{ background: rarityColor(getSlotItem(i - 1).rarity) }"
-              ></span>
             </template>
           </div>
         </div>
@@ -98,6 +93,10 @@
           <div class="attr-row">
             <span class="attr-label">💥 暴击率</span>
             <span class="attr-value">{{ (computedStats.criticalRate * 100).toFixed(1) }}%</span>
+          </div>
+          <div class="attr-row">
+            <span class="attr-label">💢 爆伤</span>
+            <span class="attr-value">{{ (computedStats.critDamage * 100).toFixed(0) }}%</span>
           </div>
           <div class="attr-row">
             <span class="attr-label">👻 闪避率</span>
@@ -308,7 +307,9 @@ const equippedItems = computed(() => inventoryStore.equippedItems)
 const backpackItems = computed(() => inventoryStore.backpackItems)
 
 const forgeItems = computed(() => {
-  const backpackEquip = backpackItems.value.filter(forgeFilter)
+  const rarityOrder = { red: 0, legendary: 1, orange: 1, epic: 2, purple: 2, rare: 3, blue: 3, uncommon: 4, common: 5 }
+  const sortByQuality = (a, b) => (rarityOrder[a.rarity] ?? 6) - (rarityOrder[b.rarity] ?? 6)
+  const backpackEquip = [...backpackItems.value.filter(forgeFilter)].sort(sortByQuality)
   const equippedList = equipSlots
     .map((s) => {
       const e = equippedItems.value[s.key]
@@ -316,7 +317,8 @@ const forgeItems = computed(() => {
       return { ...e, isEquipped: true, equipSlot: s.key }
     })
     .filter(Boolean)
-  return [...backpackEquip, ...equippedList]
+    .sort(sortByQuality)
+  return [...equippedList, ...backpackEquip]
 })
 
 const usedSlots = computed(() => backpackItems.value.length)
@@ -338,7 +340,7 @@ function close() {
 }
 
 function onSort() {
-  inventoryStore.sortBackpack('type')
+  inventoryStore.sortBackpack('quality')
   showToast('背包已整理')
 }
 
@@ -439,7 +441,7 @@ function forgeGrowthPreview(item) {
   const equipData = EQUIPMENT[item.name]
   if (!equipData || !equipData.growth) return ''
   const parts = []
-  const statNames = { attack: '攻击', defense: '防御', hp: '生命', mp: '魔力', atkSpeed: '攻速', critRate: '暴击' }
+  const statNames = { attack: '攻击', defense: '防御', hp: '生命', maxHp: '生命', mp: '魔力', magic: '魔力', atkSpeed: '攻速', speed: '速度', critRate: '暴击', criticalRate: '暴击', dodgeRate: '闪避' }
   for (const [key, value] of Object.entries(equipData.growth)) {
     const name = statNames[key] || key
     parts.push(name + '+' + value)
@@ -720,6 +722,7 @@ const computedStats = computed(() => {
     defense: stats.defense,
     speed: stats.atkSpeed,
     criticalRate: stats.critRate,
+    critDamage: stats.critDamage || 1.5,
     dodgeRate: stats.dodgeRate,
     magic: stats.magic || 0,
     magicRegen: (stats.magicRegen || 0).toFixed(1),
@@ -743,12 +746,15 @@ const equipBonusSummary = computed(() => {
   }
   const labels = {
     attack: '攻击力', defense: '防御力', maxHp: '生命值', speed: '速度',
-    magic: '魔力', criticalRate: '暴击率', dodgeRate: '闪避率',
+    magic: '魔力', criticalRate: '暴击率', critDamage: '爆伤', dodgeRate: '闪避率',
     magicRegen: '魔力回复', goldBonus: '金币加成',
   }
   return Object.entries(bonuses).map(([k, v]) => {
     if (k === 'criticalRate' || k === 'dodgeRate' || k === 'goldBonus') {
       return { label: labels[k] || k, value: (v * 100).toFixed(1) + '%' }
+    }
+    if (k === 'critDamage') {
+      return { label: labels[k] || k, value: '+'+ (v * 100).toFixed(1) + '%' }
     }
     return { label: labels[k] || k, value: Math.floor(v) }
   })
@@ -759,7 +765,7 @@ const runeBonusSummary = computed(() => {
   const summary = []
   const labelMap = {
     attack: '攻击力', defense: '防御力', maxHp: '生命值', speed: '速度',
-    magic: '魔力', criticalRate: '暴击率', dodgeRate: '闪避率', magicRegen: '魔力回复',
+    magic: '魔力', criticalRate: '暴击率', critDamage: '爆伤', dodgeRate: '闪避率', magicRegen: '魔力回复',
   }
   for (const rune of activeRunes) {
     if (!rune) continue
@@ -772,6 +778,8 @@ const runeBonusSummary = computed(() => {
       const label = labelMap[statKey] || statKey
       if (statKey === 'criticalRate' || statKey === 'dodgeRate') {
         summary.push({ label, value: (val * 100).toFixed(1) + '%' })
+      } else if (statKey === 'critDamage') {
+        summary.push({ label, value: '+'+ (val * 100).toFixed(1) + '%' })
       } else if (statKey === 'magicRegen') {
         summary.push({ label, value: val.toFixed(1) + '/回合' })
       } else {
@@ -856,7 +864,7 @@ watch(() => props.modelValue, (val) => {
 .modal-content {
   width: 90%;
   max-width: 420px;
-  max-height: 85vh;
+  height: 85vh;
   background: linear-gradient(180deg, #2a2a32, #1a1a22);
   border-radius: 20px;
   border: 1px solid rgba(180, 180, 195, 0.25);
@@ -1027,6 +1035,9 @@ watch(() => props.modelValue, (val) => {
   object-fit: cover;
   border-radius: 6px;
   image-rendering: crisp-edges;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .equip-lv {
@@ -1056,7 +1067,13 @@ watch(() => props.modelValue, (val) => {
 .equip-label {
   font-size: 0.6rem;
   color: rgba(180, 210, 240, 0.7);
-  margin-top: 2px;
+  position: absolute;
+  bottom: 2px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  z-index: 1;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 
 .modal-body {
@@ -1083,7 +1100,7 @@ watch(() => props.modelValue, (val) => {
 
 .backpack-grid {
   display: grid;
-  grid-template-columns: repeat(10, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 4px;
 }
 
@@ -1091,7 +1108,7 @@ watch(() => props.modelValue, (val) => {
   aspect-ratio: 1;
   background: rgba(8, 25, 42, 0.7);
   border: 1.5px solid rgba(100, 160, 200, 0.2);
-  border-radius: 8px;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -1125,7 +1142,7 @@ watch(() => props.modelValue, (val) => {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 0;
   pointer-events: none;
   image-rendering: crisp-edges;
 }
@@ -1140,13 +1157,7 @@ watch(() => props.modelValue, (val) => {
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.9), 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
-.item-rarity-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-}
+
 
 .modal-footer {
   padding: 10px 16px;
@@ -1676,7 +1687,7 @@ watch(() => props.modelValue, (val) => {
   }
 
   .backpack-grid {
-    grid-template-columns: repeat(10, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 3px;
   }
 

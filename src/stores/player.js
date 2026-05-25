@@ -349,6 +349,66 @@ export const usePlayerStore = defineStore('player', () => {
     },
   })
 
+  const lastNewbieCheckinDate = computed({
+    get: () => _user()?.lastNewbieCheckinDate || '',
+    set: (val) => {
+      const u = _user()
+      if (!u) return
+      u.lastNewbieCheckinDate = val
+      auth.saveAccounts()
+    },
+  })
+
+  const newbieCheckinDay = computed({
+    get: () => _user()?.newbieCheckinDay || 1,
+    set: (val) => {
+      const u = _user()
+      if (!u) return
+      u.newbieCheckinDay = val
+      auth.saveAccounts()
+    },
+  })
+
+  const lastMonthlyCheckin = computed({
+    get: () => _user()?.lastMonthlyCheckin || '',
+    set: (val) => {
+      const u = _user()
+      if (!u) return
+      u.lastMonthlyCheckin = val
+      auth.saveAccounts()
+    },
+  })
+
+  const lastMonthlyCheckinDate = computed({
+    get: () => _user()?.lastMonthlyCheckinDate || '',
+    set: (val) => {
+      const u = _user()
+      if (!u) return
+      u.lastMonthlyCheckinDate = val
+      auth.saveAccounts()
+    },
+  })
+
+  const monthlyCheckinDays = computed({
+    get: () => _user()?.monthlyCheckinDays || [],
+    set: (val) => {
+      const u = _user()
+      if (!u) return
+      u.monthlyCheckinDays = val
+      auth.saveAccounts()
+    },
+  })
+
+  const monthlyCheckinMonth = computed({
+    get: () => _user()?.monthlyCheckinMonth || '',
+    set: (val) => {
+      const u = _user()
+      if (!u) return
+      u.monthlyCheckinMonth = val
+      auth.saveAccounts()
+    },
+  })
+
   const lastWeeklyCheckin = computed({
     get: () => _user()?.lastWeeklyCheckin || '',
     set: (val) => {
@@ -591,6 +651,12 @@ export const usePlayerStore = defineStore('player', () => {
     mistIslandClears,
     achievements,
     lastNewbieCheckin,
+    lastNewbieCheckinDate,
+    newbieCheckinDay,
+    lastMonthlyCheckin,
+    lastMonthlyCheckinDate,
+    monthlyCheckinDays,
+    monthlyCheckinMonth,
     lastWeeklyCheckin,
     weeklyCheckinDays,
     expToNextLevel,

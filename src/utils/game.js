@@ -163,7 +163,8 @@ export function calculateBattleStats(className, level, baseStats) {
             defense: 8 + baseStats.constitution * 3,
             atkSpeed: 1.0,
             moveSpeed: 3.0,
-            critRate: baseStats.luck * 0.35,
+            critRate: +(baseStats.luck * 0.0035).toFixed(4),
+            critDamage: 1.5,
             rareDropRate: baseStats.luck * 0.6,
             dodgeRate: 0,
             magicRegen: 0
@@ -189,11 +190,13 @@ export function calculateBattleStats(className, level, baseStats) {
         stats.atkSpeed = +(stats.atkSpeed + baseStats.agility * 0.02).toFixed(2);
     }
 
-    stats.critRate = +(baseStats.luck * 0.35).toFixed(2);
+    stats.critRate = +(baseStats.luck * 0.0035).toFixed(4);
 
     if (className === '平民') {
-        stats.critRate = +(stats.critRate + baseStats.luck * 0.25).toFixed(2);
+        stats.critRate = +(stats.critRate + baseStats.luck * 0.0025).toFixed(4);
     }
+
+    stats.critDamage = 1.5;
 
     stats.rareDropRate = +(baseStats.luck * 0.6).toFixed(2);
 
@@ -269,6 +272,7 @@ export function getMonsterData(floor) {
             name: boss.name,
             img: '/image/monster/' + boss.img,
             hp: Math.floor(boss.hp * multiplier),
+            maxHp: Math.floor(boss.hp * multiplier),
             attack: Math.floor(boss.attack * multiplier),
             defense: Math.floor(boss.defense * multiplier),
             atkSpeed: boss.atkSpeed,
@@ -283,6 +287,7 @@ export function getMonsterData(floor) {
             name: elite.name,
             img: '/image/monster/' + elite.img,
             hp: Math.floor(elite.hp * multiplier),
+            maxHp: Math.floor(elite.hp * multiplier),
             attack: Math.floor(elite.attack * multiplier),
             defense: Math.floor(elite.defense * multiplier),
             atkSpeed: elite.atkSpeed,
@@ -296,6 +301,7 @@ export function getMonsterData(floor) {
             name: '未知怪物',
             img: '/image/monster/雪绒兔.webp',
             hp: 50,
+            maxHp: 50,
             attack: 10,
             defense: 5,
             atkSpeed: 1.0,
@@ -309,6 +315,7 @@ export function getMonsterData(floor) {
         name: base.name,
         img: '/image/monster/' + base.img,
         hp: Math.floor(base.hp * multiplier),
+        maxHp: Math.floor(base.hp * multiplier),
         attack: Math.floor(base.attack * multiplier),
         defense: Math.floor(base.defense * multiplier),
         atkSpeed: base.atkSpeed,
@@ -316,6 +323,77 @@ export function getMonsterData(floor) {
         isBoss: false,
         isElite: false
     };
+}
+
+export function generateDungeonMonsters(floor) {
+    // BOSS 层只有一个 BOSS
+    const mainMonster = getMonsterData(floor)
+    if (mainMonster.isBoss || mainMonster.isElite) {
+        return [mainMonster, null, null, null]
+    }
+
+    // 普通层：2-4 个怪物
+    const count = 2 + Math.floor(Math.random() * 3) // 2, 3, or 4
+    const monsters = [mainMonster]
+    const usedNames = new Set([mainMonster.name])
+
+    // 获取可用楼层范围
+    const minFloor = Math.max(1, floor - 2)
+    const maxFloor = floor + 2
+
+    for (let i = 1; i < count; i++) {
+        // 尝试找不同名的怪物
+        let candidate = null
+        let attempts = 0
+        while (attempts < 20) {
+            const randFloor = minFloor + Math.floor(Math.random() * (maxFloor - minFloor + 1))
+            const base = MONSTERS[randFloor]
+            if (base && !usedNames.has(base.name)) {
+                const multiplier = getMonsterMultiplier(floor) * (0.75 + Math.random() * 0.2)
+                candidate = {
+                    name: base.name,
+                    img: '/image/monster/' + base.img,
+                    hp: Math.floor(base.hp * multiplier),
+                    maxHp: Math.floor(base.hp * multiplier),
+                    attack: Math.floor(base.attack * multiplier),
+                    defense: Math.floor(base.defense * multiplier),
+                    atkSpeed: base.atkSpeed,
+                    moveSpeed: base.moveSpeed,
+                    isBoss: false,
+                    isElite: false
+                }
+                break
+            }
+            attempts++
+        }
+        // 如果实在找不到不同名的，随机选一个
+        if (!candidate) {
+            const randFloor = minFloor + Math.floor(Math.random() * (maxFloor - minFloor + 1))
+            const base = MONSTERS[randFloor] || MONSTERS[1]
+            const multiplier = getMonsterMultiplier(floor) * (0.75 + Math.random() * 0.2)
+            candidate = {
+                name: base.name + '*',
+                img: '/image/monster/' + base.img,
+                hp: Math.floor(base.hp * multiplier),
+                maxHp: Math.floor(base.hp * multiplier),
+                attack: Math.floor(base.attack * multiplier),
+                defense: Math.floor(base.defense * multiplier),
+                atkSpeed: base.atkSpeed,
+                moveSpeed: base.moveSpeed,
+                isBoss: false,
+                isElite: false
+            }
+        }
+        usedNames.add(candidate.name)
+        monsters.push(candidate)
+    }
+
+    // 补齐到 4 个位置
+    while (monsters.length < 4) {
+        monsters.push(null)
+    }
+
+    return monsters
 }
 
 export function generateBossEvolution(boss, evoCount) {
@@ -378,7 +456,8 @@ export function getCharacterStats(className, level, equipBonus, runeBonus, talen
         stats.attack += equipBonus.attack || 0;
         stats.defense += equipBonus.defense || 0;
         stats.atkSpeed = +(stats.atkSpeed + (equipBonus.atkSpeed || 0)).toFixed(2);
-        stats.critRate = +(stats.critRate + (equipBonus.critRate || 0)).toFixed(2);
+        stats.critRate = +(stats.critRate + (equipBonus.critRate || 0)).toFixed(4);
+        stats.critDamage = (stats.critDamage || 1.5) + (equipBonus.critDamage || 0);
         stats.magic = (stats.magic || 0) + (equipBonus.magic || 0);
     }
 
@@ -387,7 +466,8 @@ export function getCharacterStats(className, level, equipBonus, runeBonus, talen
         stats.attack += runeBonus.attack || 0;
         stats.defense += runeBonus.defense || 0;
         stats.atkSpeed = +(stats.atkSpeed + (runeBonus.atkSpeed || 0)).toFixed(2);
-        stats.critRate = +(stats.critRate + (runeBonus.critRate || 0)).toFixed(2);
+        stats.critRate = +(stats.critRate + (runeBonus.critRate || 0)).toFixed(4);
+        stats.critDamage = (stats.critDamage || 1.5) + (runeBonus.critDamage || 0);
         stats.magic += runeBonus.magic || 0;
         stats.dodgeRate = runeBonus.dodgeRate || 0;
         stats.magicRegen = runeBonus.magicRegen || 0;
@@ -398,9 +478,19 @@ export function getCharacterStats(className, level, equipBonus, runeBonus, talen
         if (talentBonus.attack > 0) stats.attack = Math.floor(stats.attack * (1 + talentBonus.attack / 100));
         if (talentBonus.defense > 0) stats.defense = Math.floor(stats.defense * (1 + talentBonus.defense / 100));
         if (talentBonus.atkSpeed > 0) stats.atkSpeed = +(stats.atkSpeed * (1 + talentBonus.atkSpeed / 100)).toFixed(2);
-        if (talentBonus.critRate > 0) stats.critRate = +(stats.critRate + talentBonus.critRate).toFixed(2);
+        if (talentBonus.critRate > 0) stats.critRate = +(stats.critRate + talentBonus.critRate).toFixed(4);
+        if (talentBonus.critDamage > 0) stats.critDamage = (stats.critDamage || 1.5) + talentBonus.critDamage;
         if (talentBonus.magic > 0) stats.magic = Math.floor(stats.magic * (1 + talentBonus.magic / 100));
     }
+
+    // 暴击率溢出转换：超过 100% 的部分按 10% 转为爆伤
+    stats.critDamage = stats.critDamage || 1.5;
+    if (stats.critRate > 1.0) {
+        const overflow = stats.critRate - 1.0;
+        stats.critDamage += overflow * 0.1;
+        stats.critRate = 1.0;
+    }
+    stats.critDamage = +stats.critDamage.toFixed(2);
 
     return stats;
 }
@@ -416,7 +506,7 @@ export function calculateEquipmentStats(equipData, level) {
 }
 
 export function getEquipmentBonus(equipped) {
-    const bonus = { maxHp: 0, attack: 0, defense: 0, atkSpeed: 0, moveSpeed: 0, critRate: 0, magic: 0, dodgeRate: 0, magicRegen: 0 };
+    const bonus = { maxHp: 0, attack: 0, defense: 0, atkSpeed: 0, moveSpeed: 0, critRate: 0, critDamage: 0, magic: 0, dodgeRate: 0, magicRegen: 0 };
     if (!equipped) return bonus;
 
     Object.values(equipped).forEach(equip => {
@@ -430,7 +520,9 @@ export function getEquipmentBonus(equipped) {
             } else if (key === 'speed') {
                 bonus.atkSpeed += value * 0.01;
             } else if (key === 'criticalRate') {
-                bonus.critRate += value * 100;
+                bonus.critRate += value;
+            } else if (key === 'critDamage') {
+                bonus.critDamage += value;
             }
         });
     });
@@ -439,7 +531,7 @@ export function getEquipmentBonus(equipped) {
 }
 
 export function getTalentBonus(userTalents, className) {
-    const bonus = { maxHp: 0, attack: 0, defense: 0, atkSpeed: 0, critRate: 0, magic: 0 };
+    const bonus = { maxHp: 0, attack: 0, defense: 0, atkSpeed: 0, critRate: 0, critDamage: 0, magic: 0 };
     if (!userTalents) return bonus;
 
     const classTalents = TALENTS[className];
@@ -459,7 +551,10 @@ export function getTalentBonus(userTalents, className) {
                 bonus.maxHp += value;
                 break;
             case 'crit_rate':
-                bonus.critRate += value;
+                bonus.critRate += value / 100;
+                break;
+            case 'crit_damage':
+                bonus.critDamage += value / 100;
                 break;
             case 'attack_speed':
                 bonus.atkSpeed += value;
@@ -476,7 +571,7 @@ export function getTalentBonus(userTalents, className) {
                 bonus.attack += value;
                 bonus.defense += value;
                 bonus.atkSpeed += value;
-                bonus.critRate += value;
+                bonus.critRate += value / 100;
                 bonus.magic += value;
                 break;
         }
@@ -497,7 +592,7 @@ export function getRuneBonus(type, level) {
 }
 
 export function getTotalRuneBonus(equippedRunes) {
-    const bonus = { maxHp: 0, attack: 0, defense: 0, atkSpeed: 0, critRate: 0, magic: 0, dodgeRate: 0, magicRegen: 0 };
+    const bonus = { maxHp: 0, attack: 0, defense: 0, atkSpeed: 0, critRate: 0, critDamage: 0, magic: 0, dodgeRate: 0, magicRegen: 0 };
 
     equippedRunes.forEach(rune => {
         if (!rune) return;
@@ -509,7 +604,8 @@ export function getTotalRuneBonus(equippedRunes) {
                 case 'defense': bonus.defense += value; break;
                 case 'speed': bonus.atkSpeed += value * 0.01; break;
                 case 'magic': bonus.magic += value; break;
-                case 'criticalRate': bonus.critRate += value * 100; break;
+                case 'criticalRate': bonus.critRate += value; break;
+                case 'critDamage': bonus.critDamage += value; break;
                 case 'dodgeRate': bonus.dodgeRate += value * 100; break;
                 case 'magicRegen': bonus.magicRegen += value; break;
             }

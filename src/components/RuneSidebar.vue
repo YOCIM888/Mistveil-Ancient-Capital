@@ -184,6 +184,7 @@ const runeBonusLabelMap = {
   speed: '速度',
   magic: '魔力',
   criticalRate: '暴击率',
+  critDamage: '爆伤',
   dodgeRate: '闪避率',
   magicRegen: '魔力回复',
 }
@@ -348,7 +349,7 @@ function getRuneBonusDetail(rune) {
   for (const [key, baseVal] of Object.entries(bonus.base)) {
     const perLevelVal = bonus.perLevel[key] || 0
     let val = baseVal + perLevelVal * (lvl - 1)
-    if (key === 'criticalRate' || key === 'dodgeRate') {
+    if (key === 'criticalRate' || key === 'dodgeRate' || key === 'critDamage') {
       result[key] = (val * 100).toFixed(1) + '%'
     } else if (key === 'magicRegen') {
       result[key] = val.toFixed(1) + '/回合'
@@ -390,25 +391,31 @@ function showToast(msg) {
   background: rgba(2, 12, 28, 0.7);
   z-index: 900;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-panel {
-  width: 320px;
-  height: 100%;
+  width: 340px;
+  height: 85vh;
+  max-height: 85vh;
   background: linear-gradient(180deg, #0a1e35 0%, #08172b 30%, #061220 100%);
-  border-right: 2px solid rgba(100, 180, 230, 0.35);
+  border: 2px solid rgba(100, 180, 230, 0.35);
+  border-radius: 20px;
   box-shadow:
     6px 0 30px rgba(0, 0, 0, 0.6),
     2px 0 20px rgba(60, 140, 210, 0.15);
   display: flex;
   flex-direction: column;
-  transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: scale(0.9);
+  opacity: 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
   overflow: hidden;
 }
 
 .sidebar-open {
-  transform: translateX(0);
+  transform: scale(1);
+  opacity: 1;
 }
 
 .sidebar-header {

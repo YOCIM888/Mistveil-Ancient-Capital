@@ -1,0 +1,918 @@
+[
+  {
+    "path": "/audio/旅途.mp3",
+    "type": "audio"
+  },
+  {
+    "path": "/icon/mac.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/创世神剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/创世神戒.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/创世神盔.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/创世神袍.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/创世神裤.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/创世神靴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/墨韵下裳.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/墨韵之剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/墨韵发冠.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/墨韵步履.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/墨韵玉佩.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/墨韵长衫.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/天使之裙.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/天使之靴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/天使信物.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/天使光剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/天使头环.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/天使护甲.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/帝冥骨甲.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/帝棘之裤.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/帝渊之眼.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/帝炎之靴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/帝霜冰剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/帝鬼魔盔.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/平民皮裤.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/平民硬币.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/平民长靴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/平民面具.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/平民风衣.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/平民黑剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/新手上衣.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/新手护符.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/新手草帽.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/新手裤子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/新手铁剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/新手靴子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/旅人帽子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/旅人徽章.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/旅人皮甲.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/旅人长剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/旅人长裤.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/旅人靴子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/暗黑令牌.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/暗黑神冠.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/暗黑神剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/暗黑神护腿.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/暗黑神袍.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/暗黑神靴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/武僧头巾.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/武僧拳套.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/武僧衣袍.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/武僧裤子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/武僧鞋子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/武僧项链.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/法师假面.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/法师冰靴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/法师宝石.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/法师护腿.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/法师法杖.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/法师长袍.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/洋流上衣.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/洋流之剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/洋流头盔.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/洋流裤子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/洋流鞋子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/洋流项链.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/游侠信物.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/游侠兜帽.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/游侠战靴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/游侠皮衣.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/游侠裤子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/游侠长弓.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/牧师冠冕.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/牧师宝石.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/牧师法杖.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/牧师法袍.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/牧师裤子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/牧师靴子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/狂战头盔.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/狂战戒指.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/狂战短裤.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/狂战藤甲.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/狂战钢剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/狂战靴子.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/盾骑之剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/盾骑之靴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/盾骑头盔.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/盾骑徽章.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/盾骑护甲.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/盾骑护腿.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/龙神之剑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/龙神之盔.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/龙神之蛋.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/龙神之衣.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/龙神之裤.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/equipment/龙神之靴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/中级血瓶.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/中级魔瓶.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/中经验瓶.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/创世卷轴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/初级血瓶.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/初级魔瓶.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/大经验瓶.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/契约卷轴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/威能卷轴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/小经验瓶.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/暴戾卷轴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/生命之水.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/经验圣典.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/背包扩容卡.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/通灵卷轴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/金甲卷轴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/附魔之水.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/飓风卷轴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/高级血瓶.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/items/高级魔瓶.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/main/主页.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/main/千雾古都.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/main/平民头像.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/main/武僧头像.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/main/法师头像.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/main/游侠头像.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/main/牧师头像.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/main/狂战头像.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/main/盾骑头像.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/亡灵战士.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/元素融合体.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/元素领主埃欧努斯.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰元素.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰原野猪.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰封女王艾莎.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰岩傀儡.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰牙狼.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰翼石像鬼.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰蛛女王.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰蛛幼崽.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰霜巫妖.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰龙女王希瓦娜.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/冰龙幼崽.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/墓穴君王阿尔萨斯.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/墓穴蠕虫.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/大祭司助手.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/宝石史莱姆.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/寒冰使徒.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/寒冰大天使.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/寒冰祭司.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/寒霜元素.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/寒霜蜥蜴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/峡谷巨兽洛克.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/巨型墓穴蠕虫.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/巨型战争傀儡.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/巨型蝙蝠王.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/巨形雪人.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/巫妖领主.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/怨灵骑士.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/成年冰龙.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/战争傀儡.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/战争统帅马格努斯.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/战场幽灵.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/晶化工头.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/晶化巨像克里斯特.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/晶化矿工.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/枯木守卫.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/森林守望者艾拉.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/毒蘑菇怪.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/水元素.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/水晶巨蛛.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/水晶蜘蛛.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/永冻之魂.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/熔岩冰傀儡.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/王座守卫.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/矿洞幽灵.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/神殿大祭司伊芙琳.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/神殿守卫.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/神殿骑士.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/神殿骑士长.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/腐化树精.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/落石怪.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/蒸汽元素.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/虚空元素.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/虚空行者.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/虚空领主.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/裂谷蝙蝠.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/远古战士.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/远古战神.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/雪原狼王.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/雪原领主格伦.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/雪精灵.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/雪绒兔.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/霜雪雪人.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/骷髅弓箭手.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/龙人将军.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/龙人战士.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/龙息法师.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/monster/龙蛋守卫.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/role/平民.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/role/武僧.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/role/法师.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/role/游侠.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/role/牧师.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/role/狂战.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/role/盾骑.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/住处.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/兑换.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/凌驾.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/商店.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/图鉴.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/天外境.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/天赋.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/宠物.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/战斗.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/技能-战斗页面.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/技能.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/投降.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/挑战.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/攻击.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/物品.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/礼包.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/符文.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/签到.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/背包.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/自动战斗.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/设置 .webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/迷雾岛.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/通天路.webp",
+    "type": "image"
+  },
+  {
+    "path": "/image/UI/防御.webp",
+    "type": "image"
+  },
+  {
+    "path": "/vedio/bg.mp4",
+    "type": "video"
+  }
+]

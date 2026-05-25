@@ -5,6 +5,7 @@ export const RUNE_TYPES = {
   speed: { id: 'speed', name: '速度符文', icon: '⚡', color: '#7bed9f' },
   magic: { id: 'magic', name: '魔力符文', icon: '✨', color: '#a29bfe' },
   critical: { id: 'critical', name: '暴击符文', icon: '💥', color: '#fdcb6e' },
+  critDmg: { id: 'critDmg', name: '爆伤符文', icon: '💢', color: '#ff9f43' },
   dodge: { id: 'dodge', name: '闪避符文', icon: '👻', color: '#eccc68' },
   regen: { id: 'regen', name: '回复符文', icon: '🔄', color: '#81ecec' },
 }
@@ -29,6 +30,7 @@ export const RUNE_BONUS = {
   speed: { base: { speed: 5 }, perLevel: { speed: 3 } },
   magic: { base: { magic: 30 }, perLevel: { magic: 15 } },
   critical: { base: { criticalRate: 0.05 }, perLevel: { criticalRate: 0.025 } },
+  critDmg: { base: { critDamage: 0.04 }, perLevel: { critDamage: 0.02 } },
   dodge: { base: { dodgeRate: 0.03 }, perLevel: { dodgeRate: 0.015 } },
   regen: { base: { magicRegen: 2 }, perLevel: { magicRegen: 1 } },
 }

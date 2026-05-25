@@ -47,8 +47,8 @@ export const usePetStore = defineStore('pet', () => {
       id: pet.id || `pet_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
       name: pet.name || '未知宠物',
       rarity: pet.rarity || 'common',
-      hp: pet.hp != null ? Math.floor(pet.hp * 0.5) : 100,
-      atk: pet.atk != null ? Math.floor(pet.atk * 0.5) : 10,
+      hp: pet.hp != null ? pet.hp : 100,
+      atk: pet.atk != null ? pet.atk : 10,
       img: pet.img || '',
       level: pet.level || 1,
     }

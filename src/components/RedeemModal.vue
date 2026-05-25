@@ -74,37 +74,73 @@ const message = ref('')
 const isError = ref(false)
 
 const VALID_CODES = {
-  FROZEN2024: {
-    gold: 100,
-    diamond: 5,
-  },
-  ICEKINGDOM: {
-    gold: 500,
-    diamond: 10,
+  YOCIM999: {
+    gold: 9999,
+    diamond: 99,
     items: [
-      { name: '初级血瓶', quantity: 3 },
+      { name: '经验圣典', quantity: 9 },
+    ],
+  },
+  YOCIM888: {
+    gold: 8888,
+    diamond: 88,
+    items: [
+      { name: '大经验瓶', quantity: 8 },
+    ],
+  },
+  YOCIM777: {
+    gold: 7777,
+    evolutionCoin: 77,
+    items: [
+      { name: '生命之水', quantity: 7 },
+    ],
+  },
+  YOCIM666: {
+    gold: 6666,
+    items: [
+      { name: '创世契约', quantity: 1 },
+      { name: '附魔之水', quantity: 6 },
     ],
   },
   WELCOME: {
-    gold: 200,
+    diamond: 1314,
     items: [
-      { name: '经验圣典', quantity: 1 },
+      { name: '小经验瓶', quantity: 520 },
+    ],
+  },
+  'GITHUB-YOCIM888': {
+    items: [
+      { name: '通灵卷轴', quantity: 8 },
+      { name: '契约卷轴', quantity: 8 },
+      { name: '背包扩容卡', quantity: 8 },
     ],
   },
 }
 
 const codeList = [
   {
-    code: 'FROZEN2024',
-    rewards: ['💰 100金币', '💎 5钻石'],
+    code: 'YOCIM999',
+    rewards: ['💰 9999金币', '💎 99钻石', '📖 经验圣典×9'],
   },
   {
-    code: 'ICEKINGDOM',
-    rewards: ['💰 500金币', '💎 10钻石', '🧪 初级血瓶×3'],
+    code: 'YOCIM888',
+    rewards: ['💰 8888金币', '💎 88钻石', '⭐ 大经验瓶×8'],
+  },
+  {
+    code: 'YOCIM777',
+    rewards: ['💰 7777金币', '✨ 77进化币', '💧 生命之水×7'],
+  },
+  {
+    code: 'YOCIM666',
+    rewards: ['💰 6666金币', '📜 创世契约×1', '✨ 附魔之水×6'],
   },
   {
     code: 'WELCOME',
-    rewards: ['💰 200金币', '📖 经验圣典×1'],
+    rewards: ['💎 1314钻石', '⭐ 小经验瓶×520'],
+  },
+  {
+    code: 'GITHUB-YOCIM888',
+    rewards: ['📜 通灵卷轴×8', '📜 契约卷轴×8', '🎒 背包扩容卡×8'],
   },
 ]
 
@@ -174,6 +210,10 @@ function redeem() {
       playerStore.addDiamond(reward.diamond)
     }
 
+    if (reward.evolutionCoin) {
+      playerStore.addEvolutionCoin(reward.evolutionCoin)
+    }
+
     if (reward.items) {
       for (const item of reward.items) {
         const it = ITEMS[item.name]
@@ -181,6 +221,7 @@ function redeem() {
           inventoryStore.addItem({
             name: it.name,
             icon: it.icon || '',
+            img: it.img || '',
             type: it.type === 'heal' || it.type === 'mana' || it.type === 'exp' ? 'consumable' : 'material',
             itemType: it.type || 'other',
             effect: it.effect || null,
@@ -222,7 +263,7 @@ function redeem() {
 .modal-content {
   width: 90%;
   max-width: 440px;
-  max-height: 85vh;
+  height: 85vh;
   background: linear-gradient(135deg, rgba(10, 35, 55, 0.98), rgba(5, 20, 35, 0.98));
   border-radius: 20px;
   border: 1.5px solid rgba(120, 180, 220, 0.5);
@@ -230,7 +271,9 @@ function redeem() {
     0 20px 60px rgba(0, 0, 0, 0.7),
     0 0 40px rgba(80, 150, 220, 0.25),
     inset 0 1px 3px rgba(255, 255, 255, 0.1);
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   animation: modalPopIn 0.25s ease-out;
 }
 
@@ -251,6 +294,7 @@ function redeem() {
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid rgba(120, 180, 220, 0.3);
+  flex-shrink: 0;
 }
 
 .modal-title {
@@ -284,6 +328,9 @@ function redeem() {
 
 .modal-body {
   padding: 16px 20px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .redeem-section {

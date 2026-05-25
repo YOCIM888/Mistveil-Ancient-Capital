@@ -103,9 +103,9 @@
     </div>
 
     <div v-if="previewPet" class="pet-preview-overlay" @click.self="closePreview">
-      <div class="pet-preview-modal">
+      <div class="pet-preview-modal" :key="previewPet.id">
         <div class="pet-preview-header">
-          <img :src="'/image/monster/' + previewPet.img" class="pet-preview-img" @error="$event.target.src='/image/monster/雪绒兔.webp'" />
+          <img :src="previewImg" class="pet-preview-img" @error="$event.target.src='/image/monster/雪绒兔.webp'" />
           <div class="pet-preview-title">
             <span class="pet-preview-name">{{ previewPet.name }}</span>
             <span class="pet-preview-rarity" :class="'rarity-' + (previewPet.rarity || '普通')">{{ previewPet.rarity || '普通' }}</span>
@@ -149,6 +149,14 @@ const isReleaseMode = ref(false)
 const releaseConfirmList = ref([])
 const showConfirmDialog = ref(false)
 const previewPet = ref(null)
+
+const previewImg = computed(() => {
+  if (!previewPet.value) return '/image/monster/雪绒兔.webp'
+  const img = previewPet.value.img
+  if (!img || img === '') return '/image/monster/雪绒兔.webp'
+  if (img.startsWith('/')) return img
+  return '/image/monster/' + img
+})
 
 const rarityMap = {
   common: { label: '普通', color: '#9ca3af' },
@@ -276,13 +284,12 @@ function closePreview() {
 .pet-modal-content {
   width: 90%;
   max-width: 440px;
-  max-height: 90vh;
+  height: 85vh;
   background: linear-gradient(180deg, #2a2a32, #1a1a22);
   border-radius: 20px;
   border: 1px solid rgba(180, 180, 195, 0.25);
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   animation: petPopIn 0.25s ease-out;
   display: flex;
   flex-direction: column;
@@ -394,6 +401,9 @@ function closePreview() {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 /* ---------- 出战宠物区 ---------- */

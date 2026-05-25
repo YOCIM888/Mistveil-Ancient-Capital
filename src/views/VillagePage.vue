@@ -1,6 +1,6 @@
 <template>
   <div class="village-page">
-    <div class="village-bg"></div>
+    <video class="village-bg" src="/vedio/bg.mp4" autoplay loop muted playsinline></video>
 
     <div class="top-status-bar">
       <div class="sb-avatar" @click="goToSettings">
@@ -59,6 +59,10 @@
         <img src="/image/UI/天外境.webp" class="qa-img" />
         <span class="qa-label">天外境</span>
       </div>
+      <div class="qa-btn" @click="showSettings = true">
+        <img src="/image/UI/设置 .webp" class="qa-img" />
+        <span class="qa-label">设置</span>
+      </div>
     </div>
 
     <div class="right-vertical-bar">
@@ -98,33 +102,47 @@
         </div>
         <div class="checkin-tabs">
           <button :class="['checkin-tab', { active: checkinTab === 'newbie' }]" @click="checkinTab = 'newbie'">新手签到</button>
-          <button :class="['checkin-tab', { active: checkinTab === 'weekly' }]" @click="checkinTab = 'weekly'">周常签到</button>
+          <button :class="['checkin-tab', { active: checkinTab === 'monthly' }]" @click="checkinTab = 'monthly'">月签到</button>
         </div>
 
-        <div v-if="checkinTab === 'newbie'" class="checkin-grid newbie-grid">
-          <div class="checkin-day" :class="{ active: newbieDay > 1, claimed: newbieClaimed >= 1 }">
-            <span class="day-num">第1天</span>
-            <span class="day-reward">2000金币 + 30💎 + 3⭐</span>
-          </div>
-          <div class="checkin-day" :class="{ active: newbieDay > 2, claimed: newbieClaimed >= 2 }">
-            <span class="day-num">第2天</span>
-            <span class="day-reward">5进化币 + 1通灵卷轴</span>
-          </div>
-          <div class="checkin-day" :class="{ active: newbieDay > 3, claimed: newbieClaimed >= 3 }">
-            <span class="day-num">第3天</span>
-            <span class="day-reward">墨韵六件套</span>
+        <!-- 新手签到 -->
+        <div v-if="checkinTab === 'newbie'" class="checkin-newbie-list">
+          <div v-for="(day, idx) in newbieRewards" :key="idx"
+            class="newbie-day-card"
+            :class="{ active: newbieDay > idx + 1, claimed: newbieClaimed >= idx + 1, today: newbieDay === idx + 1 && newbieClaimed < idx + 1 }">
+            <div class="newbie-day-header">
+              <span class="newbie-day-num">第{{ idx + 1 }}天</span>
+              <span v-if="newbieClaimed >= idx + 1" class="newbie-check">✓</span>
+              <span v-else-if="newbieDay > idx + 1" class="newbie-missed">已过期</span>
+            </div>
+            <div class="newbie-day-items">
+              <div v-for="(r, ri) in day" :key="ri" class="newbie-reward-item">
+                <img v-if="r.img" :src="r.img" :alt="r.label" class="reward-img" />
+                <span v-else class="reward-icon">{{ r.icon || '🎁' }}</span>
+                <span class="reward-label">{{ r.label }}</span>
+                <span v-if="r.qty && r.qty > 1" class="reward-qty">×{{ r.qty }}</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div v-if="checkinTab === 'weekly'" class="checkin-grid weekly-grid">
-          <div v-for="(r, i) in weeklyRewards" :key="i" class="checkin-day" :class="{ active: weeklyDay > i + 1, claimed: weeklyClaimed.includes(i + 1) }">
-            <span class="day-num">{{ weekLabels[i] }}</span>
-            <span class="day-reward">{{ r }}</span>
+        <!-- 月签到 -->
+        <div v-if="checkinTab === 'monthly'" class="checkin-monthly-grid">
+          <div v-for="day in monthlyRewards" :key="day.day"
+            class="monthly-day-cell"
+            :class="{ claimed: monthlyClaimed.includes(day.day), today: monthlyToday === day.day }">
+            <span class="monthly-day-num">{{ day.day }}</span>
+            <span class="monthly-day-reward">{{ day.label }}</span>
           </div>
+        </div>
+
+        <div class="checkin-progress">
+          <span v-if="checkinTab === 'newbie'">{{ newbieClaimed }}/7 天</span>
+          <span v-else>{{ monthlyClaimed.length }}/28 天</span>
         </div>
 
         <button class="checkin-btn" :disabled="currentClaimed" @click="doCheckin">
-          {{ currentClaimed ? '今日已签到' : '签到领取' }}
+          {{ currentClaimed ? (checkinTab === 'newbie' && newbieClaimed >= 7 ? '签到完成' : '今日已签到') : '签到领取' }}
         </button>
       </div>
     </div>
@@ -135,6 +153,25 @@
         {{ toastMessage }}
       </div>
     </Transition>
+
+    <!-- 设置弹窗 -->
+    <div v-if="showSettings" class="settings-overlay" @click.self="showSettings = false">
+      <div class="settings-panel">
+        <div class="settings-header">
+          <span class="settings-title">⚙️ 游戏设置</span>
+          <button class="settings-close" @click="showSettings = false">✕</button>
+        </div>
+        <div class="settings-body">
+          <div class="setting-row">
+            <span class="setting-label">🎵 游戏音乐</span>
+            <label class="toggle-switch">
+              <input v-model="musicEnabled" type="checkbox" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <BattleModal v-show="battleActive" :battle-config="battleConfig" @close="endBattle" @victory="onBattleVictory" @defeat="onBattleDefeat" />
     <ConsoleModal v-model="showConsole" />
@@ -167,6 +204,7 @@ import MistIslandModal from '@/components/MistIslandModal.vue'
 import { getCharacterStats, getEquipmentBonus, getTalentBonus, getTotalRuneBonus } from '@/utils/game'
 import { ITEMS } from '@/data/items'
 import { EQUIPMENT } from '@/data/equipment'
+import { musicEnabled } from '@/utils/audioState'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -191,6 +229,7 @@ const showConsole = ref(false)
 const showHome = ref(false)
 const showMistIsland = ref(false)
 const showCheckin = ref(false)
+const showSettings = ref(false)
 const showToast = ref(false)
 const toastMessage = ref('')
 
@@ -341,12 +380,13 @@ const combatPower = computed(() => {
     const atk = stats.attack || 0
     const def = stats.defense || 0
     const hp = stats.maxHp || 0
-    const spd = stats.speed || 0
+    const spd = stats.atkSpeed || 0
     const mag = stats.magic || 0
-    const crit = (stats.criticalRate || 0) * 100
+    const crit = (stats.critRate || 0) * 100
+    const critDmg = Math.max(0, ((stats.critDamage || 1.5) - 1.5)) * 50
     const dodge = (stats.dodgeRate || 0) * 100
     const regen = (stats.magicRegen || 0) * 10
-    return atk * 2 + def * 1.5 + hp * 0.5 + spd * 3 + mag * 2 + crit + dodge + regen
+    return atk * 2 + def * 1.5 + hp * 0.5 + spd * 3 + mag * 2 + crit + critDmg + dodge + regen
   } catch (e) {
     return 0
   }
@@ -358,14 +398,106 @@ const playerAvatar = computed(() => {
 })
 
 const checkinTab = ref('newbie')
-const newbieDay = ref(1)
-const newbieClaimed = ref(0)
-const weeklyDay = ref(1)
-const weeklyClaimed = ref([])
 
-const weeklyRewards = ['1000金币', '2000金币', '3000金币', '20钻石', '30钻石', '5进化币', '已领完']
+// 新手签到奖励定义（含物品图片）
+const newbieRewards = [
+  [ // 第1天
+    { icon: '💰', label: '66666金币', img: '' },
+    { img: '/image/items/高级血瓶.webp', label: '高级血瓶', qty: 3 },
+    { img: '/image/items/高级魔瓶.webp', label: '高级魔瓶', qty: 3 },
+  ],
+  [ // 第2天
+    { icon: '💎', label: '188钻石', img: '' },
+    { img: '/image/items/通灵卷轴.webp', label: '通灵卷轴', qty: 10 },
+  ],
+  [ // 第3天
+    { icon: '💎', label: '288钻石', img: '' },
+    { img: '/image/items/中经验瓶.webp', label: '中经验瓶', qty: 30 },
+  ],
+  [ // 第4天
+    { icon: '💎', label: '388钻石', img: '' },
+    { img: '/image/items/大经验瓶.webp', label: '大经验瓶', qty: 20 },
+  ],
+  [ // 第5天
+    { icon: '💎', label: '588钻石', img: '' },
+    { img: '/image/items/经验圣典.webp', label: '经验圣典', qty: 10 },
+  ],
+  [ // 第6天
+    { icon: '💎', label: '666钻石', img: '' },
+    { img: '/image/items/生命之水.webp', label: '生命之水', qty: 5 },
+    { img: '/image/items/附魔之水.webp', label: '附魔之水', qty: 5 },
+  ],
+  [ // 第7天
+    { icon: '💎', label: '888钻石', img: '' },
+    { img: '/image/equipment/墨韵之剑.webp', label: '墨韵之剑' },
+    { img: '/image/equipment/墨韵发冠.webp', label: '墨韵发冠' },
+    { img: '/image/equipment/墨韵长衫.webp', label: '墨韵长衫' },
+    { img: '/image/equipment/墨韵下裳.webp', label: '墨韵下裳' },
+    { img: '/image/equipment/墨韵步履.webp', label: '墨韵步履' },
+    { img: '/image/equipment/墨韵玉佩.webp', label: '墨韵玉佩' },
+  ],
+]
 
-const weekLabels = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+// 新手签到天数
+const newbieDay = computed(() => playerStore.newbieCheckinDay)
+const newbieClaimed = computed(() => {
+  const last = playerStore.lastNewbieCheckinDate
+  if (!last) return 0
+  // 按UTC+8日期判断已签到天数
+  return playerStore.newbieCheckinDay - 1 + (isTodayClaimedNewbie() ? 1 : 0)
+})
+
+function isTodayClaimedNewbie() {
+  return playerStore.lastNewbieCheckinDate === getUTC8DateStr()
+}
+
+// 月签到奖励定义
+const monthlyRewards = (() => {
+  const arr = []
+  for (let d = 1; d <= 28; d++) {
+    if (d <= 6) {
+      arr.push({ day: d, label: `${d * 1000}💰`, type: 'gold', amount: d * 1000 })
+    } else if (d === 7) {
+      arr.push({ day: 7, label: '100💎', type: 'diamond', amount: 100 })
+    } else if (d <= 13) {
+      arr.push({ day: d, label: `${d - 7}🪙`, type: 'evo', amount: d - 7 })
+    } else if (d === 14) {
+      arr.push({ day: 14, label: '300💎', type: 'diamond', amount: 300 })
+    } else if (d <= 20) {
+      arr.push({ day: d, label: `${(d - 14) * 20}💎`, type: 'diamond', amount: (d - 14) * 20 })
+    } else if (d <= 27) {
+      arr.push({ day: d, label: `${(d - 14) * 20}💎`, type: 'diamond', amount: (d - 14) * 20 })
+    } else {
+      arr.push({ day: 28, label: '500💎', type: 'diamond', amount: 500 })
+    }
+  }
+  return arr
+})()
+
+const monthlyClaimed = computed(() => playerStore.monthlyCheckinDays)
+const monthlyToday = computed(() => {
+  const utc8Month = getUTC8Month()
+  if (playerStore.monthlyCheckinMonth !== utc8Month) return null
+  return getUTC8Day()
+})
+
+function getUTC8DateStr() {
+  const now = new Date()
+  const utc8 = new Date(now.getTime() + 8 * 60 * 60 * 1000)
+  return utc8.toISOString().slice(0, 10)
+}
+
+function getUTC8Day() {
+  const now = new Date()
+  const utc8 = new Date(now.getTime() + 8 * 60 * 60 * 1000)
+  return utc8.getDate()
+}
+
+function getUTC8Month() {
+  const now = new Date()
+  const utc8 = new Date(now.getTime() + 8 * 60 * 60 * 1000)
+  return `${utc8.getFullYear()}-${String(utc8.getMonth() + 1).padStart(2, '0')}`
+}
 
 const currentTime = ref('')
 let timeInterval = null
@@ -376,39 +508,16 @@ function updateCurrentTime() {
   currentTime.value = utc8.toISOString().slice(11, 19)
 }
 
-function isSameDay(timestamp1, timestamp2) {
-  if (!timestamp1 || !timestamp2) return false
-  const date1 = new Date(timestamp1)
-  const date2 = new Date(timestamp2)
-  return date1.toDateString() === date2.toDateString()
-}
-
-function isSameWeek(timestamp1, timestamp2) {
-  if (!timestamp1 || !timestamp2) return false
-  const date1 = new Date(timestamp1)
-  const date2 = new Date(timestamp2)
-  const startOfWeek = (d) => {
-    const date = new Date(d)
-    const day = date.getDay()
-    const diff = date.getDate() - day + (day === 0 ? -6 : 1)
-    return new Date(date.setDate(diff))
-  }
-  return startOfWeek(date1).toDateString() === startOfWeek(date2).toDateString()
-}
-
-const lastNewbieCheckin = ref(playerStore.lastNewbieCheckin || 0)
-const lastWeeklyCheckin = ref(playerStore.lastWeeklyCheckin || 0)
-
 const currentClaimed = computed(() => {
-  const now = Date.now()
   if (checkinTab.value === 'newbie') {
-    if (newbieClaimed.value >= newbieDay.value) return true
-    return isSameDay(lastNewbieCheckin.value, now)
+    if (newbieDay.value > 7) return true
+    return isTodayClaimedNewbie()
   } else {
-    const today = new Date()
-    const todayOfWeek = today.getDay() === 0 ? 7 : today.getDay()
-    if (playerStore.weeklyCheckinDays.includes(todayOfWeek)) return true
-    return isSameWeek(lastWeeklyCheckin.value, now) && playerStore.weeklyCheckinDays.includes(todayOfWeek)
+    const utc8Month = getUTC8Month()
+    if (playerStore.monthlyCheckinMonth !== utc8Month) return false
+    const todayDay = getUTC8Day()
+    if (todayDay > 28) return true
+    return playerStore.monthlyCheckinDays.includes(todayDay)
   }
 })
 
@@ -416,65 +525,98 @@ function doCheckin() {
   if (currentClaimed.value) return
 
   const now = Date.now()
+  const todayStr = getUTC8DateStr()
 
   if (checkinTab.value === 'newbie') {
-    const d = newbieDay.value
-    if (d === 1) {
-      playerStore.addGold(2000)
-      playerStore.addDiamond(30)
+    const day = newbieDay.value
+    if (day > 7) return
+
+    // 给予奖励
+    if (day === 1) {
+      playerStore.addGold(66666)
       for (let i = 0; i < 3; i++) {
-        inventoryStore.addItem({ ...ITEMS['小经验瓶'], id: now + i })
+        inventoryStore.addItem({ ...ITEMS['高级血瓶'], id: now + i, quantity: 1 })
+        inventoryStore.addItem({ ...ITEMS['高级魔瓶'], id: now + i + 10, quantity: 1 })
       }
-      villageMessage.value = '新手第1天签到成功！获得2000金币+30钻石+3小经验瓶'
-    } else if (d === 2) {
-      playerStore.evolutionCoin = (playerStore.evolutionCoin || 0) + 5
-      inventoryStore.addItem({ ...ITEMS['通灵卷轴'], id: now })
-      villageMessage.value = '新手第2天签到成功！获得5进化币+1通灵卷轴'
-    } else if (d === 3) {
+      villageMessage.value = '新手第1天签到成功！获得66666金币+3高级血瓶+3高级魔瓶'
+    } else if (day === 2) {
+      playerStore.addDiamond(188)
+      for (let i = 0; i < 10; i++) {
+        inventoryStore.addItem({ ...ITEMS['通灵卷轴'], id: now + i, quantity: 1 })
+      }
+      villageMessage.value = '新手第2天签到成功！获得188钻石+10通灵卷轴'
+    } else if (day === 3) {
+      playerStore.addDiamond(288)
+      for (let i = 0; i < 30; i++) {
+        inventoryStore.addItem({ ...ITEMS['中经验瓶'], id: now + i, quantity: 1 })
+      }
+      villageMessage.value = '新手第3天签到成功！获得288钻石+30中经验瓶'
+    } else if (day === 4) {
+      playerStore.addDiamond(388)
+      for (let i = 0; i < 20; i++) {
+        inventoryStore.addItem({ ...ITEMS['大经验瓶'], id: now + i, quantity: 1 })
+      }
+      villageMessage.value = '新手第4天签到成功！获得388钻石+20大经验瓶'
+    } else if (day === 5) {
+      playerStore.addDiamond(588)
+      for (let i = 0; i < 10; i++) {
+        inventoryStore.addItem({ ...ITEMS['经验圣典'], id: now + i, quantity: 1 })
+      }
+      villageMessage.value = '新手第5天签到成功！获得588钻石+10经验圣典'
+    } else if (day === 6) {
+      playerStore.addDiamond(666)
+      for (let i = 0; i < 5; i++) {
+        inventoryStore.addItem({ ...ITEMS['生命之水'], id: now + i, quantity: 1 })
+        inventoryStore.addItem({ ...ITEMS['附魔之水'], id: now + i + 10, quantity: 1 })
+      }
+      villageMessage.value = '新手第6天签到成功！获得666钻石+5生命之水+5附魔之水'
+    } else if (day === 7) {
+      playerStore.addDiamond(888)
       const moEquips = ['墨韵之剑', '墨韵发冠', '墨韵长衫', '墨韵下裳', '墨韵步履', '墨韵玉佩']
       moEquips.forEach((name, i) => {
         const eq = EQUIPMENT[name]
         if (eq) inventoryStore.addItem({ ...eq, id: now + i + 100, level: 1 })
       })
-      villageMessage.value = '新手第3天签到成功！获得墨韵六件套！'
+      villageMessage.value = '新手第7天签到成功！获得888钻石+墨韵六件套！'
     }
-    newbieClaimed.value = d
-    lastNewbieCheckin.value = now
-    playerStore.lastNewbieCheckin = now
-    if (d < 3) newbieDay.value = d + 1
+
+    playerStore.lastNewbieCheckinDate = todayStr
+    if (day < 7) {
+      playerStore.newbieCheckinDay = day + 1
+    }
   } else {
-    const today = new Date()
-    const todayOfWeek = today.getDay() === 0 ? 7 : today.getDay()
-    
-    if (!playerStore.weeklyCheckinDays.includes(todayOfWeek)) {
-      playerStore.weeklyCheckinDays = [...playerStore.weeklyCheckinDays, todayOfWeek]
-      weeklyClaimed.value = [...weeklyClaimed.value, todayOfWeek]
-      
-      if (todayOfWeek <= 3) {
-        playerStore.addGold(todayOfWeek * 1000)
-        villageMessage.value = `周常签到成功！获得${todayOfWeek * 1000}金币`
-      } else if (todayOfWeek === 4) {
-        playerStore.addDiamond(20)
-        villageMessage.value = '周常签到成功！获得20钻石'
-      } else if (todayOfWeek === 5) {
-        playerStore.addDiamond(30)
-        villageMessage.value = '周常签到成功！获得30钻石'
-      } else if (todayOfWeek === 6) {
-        playerStore.evolutionCoin = (playerStore.evolutionCoin || 0) + 5
-        villageMessage.value = '周常签到成功！获得5进化币'
-      } else if (todayOfWeek === 7) {
-        playerStore.addGold(5000)
-        playerStore.addDiamond(50)
-        villageMessage.value = '周常签到完成！获得5000金币+50钻石'
-      }
+    // 月签到
+    const todayDay = getUTC8Day()
+    if (todayDay > 28) {
+      villageMessage.value = '本月签到天数已过（仅1-28日可签到）'
+      return
     }
-    
-    lastWeeklyCheckin.value = now
-    playerStore.lastWeeklyCheckin = now
-    
-    weeklyDay.value = todayOfWeek
+
+    const utc8Month = getUTC8Month()
+    // 新月重置
+    if (playerStore.monthlyCheckinMonth !== utc8Month) {
+      playerStore.monthlyCheckinDays = []
+      playerStore.monthlyCheckinMonth = utc8Month
+    }
+
+    // 防重复
+    if (playerStore.monthlyCheckinDays.includes(todayDay)) return
+
+    const reward = monthlyRewards.find(r => r.day === todayDay)
+    if (!reward) return
+
+    if (reward.type === 'gold') {
+      playerStore.addGold(reward.amount)
+    } else if (reward.type === 'diamond') {
+      playerStore.addDiamond(reward.amount)
+    } else if (reward.type === 'evo') {
+      playerStore.addEvolutionCoin(reward.amount)
+    }
+
+    playerStore.monthlyCheckinDays = [...playerStore.monthlyCheckinDays, todayDay]
+    playerStore.lastMonthlyCheckinDate = todayStr
+    villageMessage.value = `月签到第${todayDay}天成功！获得${reward.label}`
   }
-  setTimeout(() => { showCheckin.value = false }, 1000)
 }
 
 onMounted(() => {
@@ -509,7 +651,9 @@ onUnmounted(() => {
 .village-bg {
   position: absolute;
   inset: 0;
-  background: url('/image/main/村庄.webp') center/cover no-repeat;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   z-index: 0;
 }
 
@@ -689,17 +833,18 @@ onUnmounted(() => {
 /* ===== 右侧竖排按钮 ===== */
 .right-vertical-bar {
   position: absolute;
-  right: 10px;
+  right: 0;
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+  padding-right: max(8px, env(safe-area-inset-right, 8px));
 }
 .right-btn-img {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
   cursor: pointer;
   transition: transform 0.15s, filter 0.15s;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
@@ -716,19 +861,23 @@ onUnmounted(() => {
 /* ===== 底部导航栏 ===== */
 .bottom-nav-bar {
   position: absolute;
-  bottom: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
   display: flex;
   gap: 4px;
-  padding: 0 8px;
+  padding: 0 max(8px, env(safe-area-inset-right, 8px)) 0 max(8px, env(safe-area-inset-left, 8px));
+  width: 100%;
   max-width: calc(100vw - 16px);
-  overflow-x: visible;
+  box-sizing: border-box;
+  justify-content: center;
 }
 .bottom-btn-img {
-  width: 46px;
-  height: 46px;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 1;
+  min-width: 36px;
   cursor: pointer;
   transition: transform 0.15s, filter 0.15s;
   filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
@@ -755,17 +904,22 @@ onUnmounted(() => {
 .checkin-panel {
   width: 88%;
   max-width: 360px;
+  height: 85vh;
   background: linear-gradient(180deg, #2c2c34, #1a1a20);
   border: 1px solid rgba(180, 180, 200, 0.25);
   border-radius: 16px;
   padding: 16px 18px 20px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .checkin-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  flex-shrink: 0;
 }
 .checkin-time {
   font-size: 0.75rem;
@@ -794,6 +948,7 @@ onUnmounted(() => {
   display: flex;
   gap: 8px;
   margin-bottom: 14px;
+  flex-shrink: 0;
 }
 .checkin-tab {
   flex: 1;
@@ -816,40 +971,207 @@ onUnmounted(() => {
   display: grid;
   gap: 6px;
   margin-bottom: 14px;
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
-.newbie-grid {
-  grid-template-columns: repeat(3, 1fr);
+
+/* 新手签到列表 */
+.checkin-newbie-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 2px;
 }
-.weekly-grid {
+
+.checkin-newbie-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.checkin-newbie-list::-webkit-scrollbar-track {
+  background: rgba(30, 30, 40, 0.5);
+  border-radius: 3px;
+}
+
+.checkin-newbie-list::-webkit-scrollbar-thumb {
+  background: rgba(140, 180, 200, 0.4);
+  border-radius: 3px;
+}
+
+.checkin-newbie-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(160, 200, 220, 0.6);
+}
+
+.newbie-day-card {
+  background: rgba(40, 40, 48, 0.7);
+  border: 1px solid rgba(120, 120, 140, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  transition: all 0.2s;
+}
+
+.newbie-day-card.today {
+  border-color: rgba(150, 200, 170, 0.5);
+  background: rgba(60, 100, 80, 0.25);
+}
+
+.newbie-day-card.active {
+  background: rgba(60, 100, 80, 0.15);
+  border-color: rgba(150, 200, 170, 0.25);
+}
+
+.newbie-day-card.claimed {
+  background: rgba(50, 55, 50, 0.5);
+  border-color: rgba(100, 140, 110, 0.3);
+}
+
+.newbie-day-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.newbie-day-num {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #c0c0c8;
+}
+
+.newbie-day-card.today .newbie-day-num {
+  color: #d8e8c8;
+}
+
+.newbie-check {
+  font-size: 0.75rem;
+  color: #7bed9f;
+  font-weight: 700;
+}
+
+.newbie-missed {
+  font-size: 0.7rem;
+  color: #808088;
+}
+
+.newbie-day-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.newbie-reward-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(20, 50, 70, 0.4);
+  border: 1px solid rgba(100, 160, 200, 0.2);
+  border-radius: 6px;
+  padding: 3px 8px;
+}
+
+.reward-img {
+  width: 24px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 3px;
+  image-rendering: crisp-edges;
+}
+
+.reward-icon {
+  font-size: 0.9rem;
+}
+
+.reward-label {
+  font-size: 0.72rem;
+  color: #d0e0f0;
+  font-weight: 500;
+}
+
+.reward-qty {
+  font-size: 0.68rem;
+  color: #ffd76e;
+  font-weight: 700;
+}
+
+/* 月签到网格 */
+.checkin-monthly-grid {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  display: grid;
   grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+  padding: 0 2px;
+  margin-bottom: 8px;
 }
-.checkin-day {
+
+.checkin-monthly-grid::-webkit-scrollbar {
+  width: 5px;
+}
+
+.checkin-monthly-grid::-webkit-scrollbar-track {
+  background: rgba(30, 30, 40, 0.5);
+  border-radius: 3px;
+}
+
+.checkin-monthly-grid::-webkit-scrollbar-thumb {
+  background: rgba(140, 180, 200, 0.4);
+  border-radius: 3px;
+}
+
+.checkin-monthly-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(160, 200, 220, 0.6);
+}
+
+.monthly-day-cell {
   text-align: center;
-  padding: 10px 4px;
+  padding: 8px 2px;
   background: rgba(40, 40, 48, 0.7);
   border-radius: 8px;
   border: 1px solid rgba(120, 120, 140, 0.15);
   transition: all 0.2s;
 }
-.checkin-day.active {
-  background: rgba(60, 100, 80, 0.3);
-  border-color: rgba(150, 200, 170, 0.3);
+
+.monthly-day-cell.claimed {
+  background: rgba(50, 55, 50, 0.5);
+  border-color: rgba(100, 140, 110, 0.3);
 }
-.checkin-day.claimed {
-  background: rgba(50, 50, 55, 0.6);
+
+.monthly-day-cell.today {
+  border-color: rgba(150, 200, 170, 0.5);
+  background: rgba(60, 100, 80, 0.25);
 }
-.day-num {
+
+.monthly-day-num {
   display: block;
-  font-size: 10px;
+  font-size: 0.7rem;
   color: #a0a0a8;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
-.day-reward {
+
+.monthly-day-cell.today .monthly-day-num {
+  color: #c8e0c8;
+  font-weight: 700;
+}
+
+.monthly-day-reward {
   display: block;
-  font-size: 8px;
+  font-size: 0.65rem;
   color: #c8a850;
   font-weight: 600;
   line-height: 1.3;
+}
+
+.checkin-progress {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #80c0e0;
+  padding: 4px 0 8px;
+  flex-shrink: 0;
+  font-weight: 500;
 }
 .checkin-btn {
   width: 100%;
@@ -862,6 +1184,7 @@ onUnmounted(() => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 .checkin-btn:hover:not(:disabled) {
   background: linear-gradient(180deg, rgba(70, 120, 90, 0.7), rgba(50, 85, 60, 0.7));
@@ -898,5 +1221,125 @@ onUnmounted(() => {
 .toast-leave-to {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.8);
+}
+
+/* ===== 设置弹窗 ===== */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-panel {
+  width: 85%;
+  max-width: 340px;
+  background: linear-gradient(180deg, #2c2c34, #1a1a20);
+  border: 1px solid rgba(180, 180, 200, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(180, 180, 200, 0.15);
+  background: rgba(20, 20, 28, 0.4);
+}
+
+.settings-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #d8d8e0;
+  letter-spacing: 1px;
+}
+
+.settings-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(60, 60, 70, 0.8);
+  border: 1px solid rgba(160, 160, 180, 0.3);
+  color: #c0c0c8;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-close:hover {
+  background: rgba(80, 80, 90, 0.9);
+}
+
+.settings-body {
+  padding: 16px 18px 20px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: rgba(40, 40, 48, 0.5);
+  border-radius: 12px;
+  border: 1px solid rgba(140, 140, 155, 0.15);
+}
+
+.setting-label {
+  font-size: 0.95rem;
+  color: #d0d0d8;
+  font-weight: 500;
+}
+
+/* Toggle 开关 */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  cursor: pointer;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: rgba(80, 80, 90, 0.6);
+  border-radius: 26px;
+  border: 1px solid rgba(140, 140, 155, 0.3);
+  transition: all 0.25s ease;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 2px;
+  top: 2px;
+  background: #d0d0d8;
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: rgba(60, 140, 100, 0.5);
+  border-color: rgba(100, 200, 140, 0.4);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(22px);
 }
 </style>

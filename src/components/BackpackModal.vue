@@ -238,6 +238,7 @@
         </div>
         <div class="detail-actions">
           <button v-if="canUseItem" class="action-btn action-use" @click="onUseItem">使用</button>
+          <button v-if="canUseItem && (selectedItem?.quantity || 1) > 1" class="action-btn action-use" @click="onBatchUseClick">批量使用</button>
           <button class="action-btn action-delete" @click="onDeleteClick">删除</button>
         </div>
         <button class="detail-close" @click="closeItemDetail">✕</button>
@@ -257,6 +258,23 @@
         <div class="delete-actions">
           <button class="action-btn action-delete-confirm" @click="onDeleteConfirm">确认删除</button>
           <button class="action-btn action-cancel" @click="closeDeletePanel">取消</button>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="showBatchUsePanel" class="detail-overlay" @click.self="closeBatchUsePanel">
+      <div class="detail-panel delete-panel">
+        <h3 class="delete-title" style="color:#90eea0">批量使用</h3>
+        <p class="delete-name">{{ selectedItem?.name }}</p>
+        <div class="delete-qty-row">
+          <button class="qty-btn" @click="batchUseQty = Math.max(1, batchUseQty - 1)">−</button>
+          <span class="qty-value">{{ batchUseQty }}</span>
+          <button class="qty-btn" @click="batchUseQty = Math.min(selectedItem?.quantity || 1, batchUseQty + 1)">+</button>
+          <button class="qty-btn qty-max" @click="batchUseQty = selectedItem?.quantity || 1">最大</button>
+        </div>
+        <div class="delete-actions">
+          <button class="action-btn action-use" @click="onBatchUseConfirm">确认使用</button>
+          <button class="action-btn action-cancel" @click="closeBatchUsePanel">取消</button>
         </div>
       </div>
     </div>
@@ -291,6 +309,8 @@ const selectedItem = ref(null)
 const selectedEquip = ref(null)
 const showDeletePanel = ref(false)
 const deleteQty = ref(1)
+const showBatchUsePanel = ref(false)
+const batchUseQty = ref(1)
 const toastMsg = ref('')
 let toastTimer = null
 
@@ -324,7 +344,7 @@ const forgeItems = computed(() => {
 const usedSlots = computed(() => backpackItems.value.length)
 
 const showEquipDetail = computed(() => selectedEquip.value !== null)
-const showItemDetail = computed(() => selectedItem.value !== null && !showDeletePanel.value)
+const showItemDetail = computed(() => selectedItem.value !== null && !showDeletePanel.value && !showBatchUsePanel.value)
 
 const isEquippedDetail = computed(() => {
   if (!selectedEquip.value) return false
@@ -629,6 +649,109 @@ function onDeleteConfirm() {
 
   showToast(`已删除 ${qty} 个物品`)
   closeDeletePanel()
+}
+
+function onBatchUseClick() {
+  batchUseQty.value = 1
+  showBatchUsePanel.value = true
+}
+
+function closeBatchUsePanel() {
+  showBatchUsePanel.value = false
+  batchUseQty.value = 1
+}
+
+function onBatchUseConfirm() {
+  if (!selectedItem.value) return
+  const item = selectedItem.value
+  const itemData = ITEMS[item.name]
+  if (!itemData) { closeBatchUsePanel(); return }
+
+  const qty = batchUseQty.value
+  const slotIndex = item.slot
+  const effectVal = itemData.effect || item.effect
+
+  if (itemData.effect?.expandBackpack) {
+    const expand = itemData.effect.expandBackpack
+    const current = inventoryStore.backpackCapacity
+    if (current >= 200) {
+      showToast('背包已达最大容量（200格）')
+      closeBatchUsePanel()
+      return
+    }
+    const newCap = Math.min(current + expand * qty, 200)
+    inventoryStore.backpackCapacity = newCap
+    inventoryStore.removeItem(slotIndex, qty)
+    showToast(`背包已扩容至 ${newCap} 格！`)
+    closeBatchUsePanel()
+    const updated = getSlotItem(slotIndex)
+    selectedItem.value = updated ? { ...updated } : null
+    return
+  }
+
+  switch (itemData.type) {
+    case 'heal': {
+      const healPct = typeof effectVal === 'number' ? effectVal : 0
+      const maxHp = computedStats.value.maxHp
+      const currentHp = playerStore.currentHp || 0
+      if (currentHp >= maxHp) {
+        showToast('生命值已满')
+        closeBatchUsePanel()
+        return
+      }
+      const healAmount = Math.floor(maxHp * healPct * qty)
+      playerStore.currentHp = Math.min(maxHp, currentHp + healAmount)
+      showToast(`恢复了 ${healAmount} 点生命值（使用了${qty}个）`)
+      break
+    }
+    case 'mana': {
+      const manaPct = typeof effectVal === 'number' ? effectVal : 0
+      const maxMp = playerStore.maxMp || computedStats.value.magic * 2 || 100
+      const currentMp = playerStore.currentMp || 0
+      if (currentMp >= maxMp) {
+        showToast('魔力值已满')
+        closeBatchUsePanel()
+        return
+      }
+      const restoreAmount = Math.floor(maxMp * manaPct * qty)
+      playerStore.currentMp = Math.min(maxMp, currentMp + restoreAmount)
+      showToast(`恢复了 ${restoreAmount} 点魔力值（使用了${qty}个）`)
+      break
+    }
+    case 'exp': {
+      const expAmount = (typeof effectVal === 'number' ? effectVal : 500) * qty
+      playerStore.addExp(expAmount)
+      showToast(`获得了 ${expAmount} 点经验（使用了${qty}个）`)
+      break
+    }
+    case 'buff': {
+      if (!itemData.effect || typeof itemData.effect !== 'object') {
+        showToast('无法批量使用此物品')
+        closeBatchUsePanel()
+        return
+      }
+      const buffEntry = Object.entries(itemData.effect)[0]
+      if (!buffEntry) { closeBatchUsePanel(); return }
+      const [key, val] = buffEntry
+      const u = authStore.accounts[authStore.currentUser]
+      if (!u) { closeBatchUsePanel(); return }
+      if (!u.activeBuffs) u.activeBuffs = {}
+      u.activeBuffs[key] = (u.activeBuffs[key] || 0) + val * qty
+      authStore.saveAccounts()
+      const buffLabels = { criticalRate: '暴击率', defense: '防御', speed: '速度', attack: '攻击' }
+      showToast(`获得 ${buffLabels[key] || key} 增益×${qty}（使用了${qty}个）`)
+      break
+    }
+    default:
+      showToast('无法批量使用此物品')
+      closeBatchUsePanel()
+      return
+  }
+
+  inventoryStore.removeItem(slotIndex, qty)
+  const updated = getSlotItem(slotIndex)
+  selectedItem.value = updated ? { ...updated } : null
+  closeBatchUsePanel()
 }
 
 function getEquipIcon(equip) {

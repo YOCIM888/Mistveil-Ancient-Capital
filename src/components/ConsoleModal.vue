@@ -15,8 +15,10 @@ import { useAuthStore } from '@/stores/auth'
 import { useAchievementStore } from '@/stores/achievement'
 import { useDungeonStore } from '@/stores/dungeon'
 import { useHomeStore } from '@/stores/home'
+import { useRuneStore } from '@/stores/rune'
 import { EQUIPMENT } from '@/data/equipment'
 import { ITEMS } from '@/data/items'
+import { RUNE_TYPES } from '@/data/runes'
 
 const CLASS_STAT_BONUSES = {
   狂战: { 力量: 3, 体质: 2, 敏捷: 1, 感知: 1, 智力: 1, 幸运: 1 },
@@ -151,6 +153,12 @@ function executeCommand(cmd) {
       '  /add_contract {数量}   - 添加创世契约',
       '  /add_lifewater {数量}  - 添加生命之水',
       '  /add_enchantwater {数量} - 添加附魔之水',
+      '  /get_items_道具名 数量 - 获得指定道具（如 /get_items_小经验瓶 10）',
+      '',
+      '【符文获取】',
+      '  /get_rune_符文名_等级 数量 - 获得指定符文',
+      '    符文名: 攻击/防御/生命/速度/魔力/暴击/爆伤/闪避/回复',
+      '    示例: /get_rune_暴击_10 5  → 获得5个10级暴击符文',
       '',
       '【成就进度】',
       '  /all_achievement       - 解锁全部成就',
@@ -374,6 +382,56 @@ function executeCommand(cmd) {
       })
     }
     return `已添加 ${amount} 个附魔之水到背包`
+  }
+
+  const getRuneMatch = trimmed.match(/^\/get_rune_(攻击|防御|生命|速度|魔力|暴击|爆伤|闪避|回复)_(\d+)\s*(\d*)$/)
+  if (getRuneMatch) {
+    const runeNameMap = {
+      '攻击': 'attack', '防御': 'defense', '生命': 'health', '速度': 'speed',
+      '魔力': 'magic', '暴击': 'critical', '爆伤': 'critDmg', '闪避': 'dodge', '回复': 'regen',
+    }
+    const runeType = runeNameMap[getRuneMatch[1]]
+    const runeLevel = Math.min(10, Math.max(1, parseInt(getRuneMatch[2])))
+    const quantity = parseInt(getRuneMatch[3]) || 1
+    if (!runeType) return `未知符文类型：${getRuneMatch[1]}`
+    const runeStore = useRuneStore()
+    const typeInfo = RUNE_TYPES[runeType]
+    if (!typeInfo) return `未知符文类型：${getRuneMatch[1]}`
+    const u = authStore.accounts?.[authStore.currentUser]
+    if (!u) return '未登录'
+    if (!u.runes) u.runes = []
+    for (let i = 0; i < quantity; i++) {
+      u.runes.push({
+        id: `rune_${Date.now()}_${Math.random().toString(36).slice(2, 8)}_c${i}`,
+        type: runeType,
+        level: runeLevel,
+        name: typeInfo.name,
+        icon: typeInfo.icon || '',
+        color: typeInfo.color || '#888888',
+      })
+    }
+    authStore.saveAccounts()
+    return `已添加 ${quantity} 个 ${runeLevel}级${getRuneMatch[1]}符文`
+  }
+
+  const getItemsMatch = trimmed.match(/^\/get_items_(.+?)\s+(\d+)$/)
+  if (getItemsMatch) {
+    const itemName = getItemsMatch[1].trim()
+    const quantity = parseInt(getItemsMatch[2])
+    const itemData = ITEMS[itemName]
+    if (!itemData) return `未知道具：${itemName}（可用道具：${Object.keys(ITEMS).join('、')}）`
+    const stackableTypes = ['consumable', 'material', 'heal', 'mana', 'exp', 'tame', 'buff']
+    const itemType = itemData.type === 'heal' || itemData.type === 'mana' || itemData.type === 'exp' ? 'consumable' : (stackableTypes.includes(itemData.type) ? itemData.type : 'material')
+    inventoryStore.addItem({
+      name: itemData.name,
+      icon: itemData.icon || '',
+      img: itemData.img || '',
+      type: itemType,
+      itemType: itemData.type || 'other',
+      effect: itemData.effect || null,
+      quantity: quantity,
+    })
+    return `已添加 ${quantity} 个 ${itemName} 到背包`
   }
 
   if (trimmed === '/all_achievement') {

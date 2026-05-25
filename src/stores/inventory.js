@@ -305,6 +305,37 @@ export const useInventoryStore = defineStore('inventory', () => {
     if (!u) return
     if (!u.backpackItems) return
 
+    const stackableTypes = ['consumable', 'material', 'heal', 'mana', 'exp', 'tame', 'buff']
+    const merged = []
+    const toRemove = new Set()
+    for (let i = 0; i < u.backpackItems.length; i++) {
+      if (toRemove.has(i)) continue
+      const item = u.backpackItems[i]
+      if (!stackableTypes.includes(item.type)) { merged.push(item); continue }
+      const maxStack = item.maxStack || ITEMS[item.name]?.maxStack || 999
+      for (let j = i + 1; j < u.backpackItems.length; j++) {
+        if (toRemove.has(j)) continue
+        const other = u.backpackItems[j]
+        if (other.name !== item.name || other.type !== item.type) continue
+        const currentQty = item.quantity || 1
+        const otherQty = other.quantity || 1
+        if (currentQty < maxStack) {
+          const canAdd = maxStack - currentQty
+          if (otherQty <= canAdd) {
+            item.quantity = currentQty + otherQty
+            toRemove.add(j)
+          } else {
+            item.quantity = maxStack
+            other.quantity = otherQty - canAdd
+          }
+        }
+      }
+      merged.push(item)
+    }
+    if (toRemove.size > 0) {
+      u.backpackItems = merged
+    }
+
     const items = [...u.backpackItems]
 
     switch (sortBy) {

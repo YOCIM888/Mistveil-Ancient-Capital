@@ -1,0 +1,14 @@
+node_modules
+dist
+package-lock.json
+.DS_Store
+*.local
+*.log
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# Trae specs
+.trae
